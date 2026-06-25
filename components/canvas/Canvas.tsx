@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export default function Canvas(){
-
+    const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
-        const canvas = document.getElementById("drawingCanvas");
+        const canvas = canvasRef.current;
         if (!(canvas instanceof HTMLCanvasElement)) return;
 
         const ctx = canvas.getContext("2d");
@@ -26,7 +26,7 @@ export default function Canvas(){
 
     return(
         <div className="canvas-container">
-            <canvas id="drawingCanvas"></canvas>
+            <canvas id="drawingCanvas" ref={canvasRef}></canvas>
         </div>
     )
 }
