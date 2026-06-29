@@ -1,12 +1,12 @@
 export class DrawingEngine {
-    private canvas: HTMLCanvasElement;
-    private ctx: CanvasRenderingContext2D | null;
-    private isDrawing: boolean;
-    private lastX: number;
-    private lastY: number;
-    private brushColor: string;
-    private brushSize: number;
-    private brushOpacity: number
+    public canvas: HTMLCanvasElement;
+    public ctx: CanvasRenderingContext2D | null;
+    public isDrawing: boolean;
+    public lastX: number;
+    public lastY: number;
+    public brushColor: string;
+    public brushSize: number;
+    public brushOpacity: number
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;

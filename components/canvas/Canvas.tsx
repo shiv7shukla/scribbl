@@ -1,9 +1,12 @@
 "use client";
 
+import { DrawingEngine } from "@/lib/drawingcanvas/DrawingEngine";
 import { useEffect, useRef } from "react";
+import ToolBar from "./ToolBar";
 
 export default function Canvas(){
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const engineRef = useRef<DrawingEngine>(null);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -22,10 +25,13 @@ export default function Canvas(){
 
         canvas.style.width = `${rect.width}px`;
         canvas.style.height = `${rect.height}px`;
+
+        engineRef.current = new DrawingEngine(canvas);
     }, []);
 
     return(
         <div className="canvas-container">
+            <ToolBar engineRef={engineRef} />
             <canvas id="drawingCanvas" ref={canvasRef}></canvas>
         </div>
     )
