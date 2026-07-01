@@ -11,15 +11,24 @@ const ToolBar = ({ engineRef }: ToolbarProps) => {
             <input 
                 type="color" 
                 defaultValue="#000000" 
-                onChange={(e) => {if (engineRef.current) engineRef.current.setBrush(e.target.value, engineRef.current.brushSize)}} 
+                onChange={(e) => {
+                    if (engineRef.current) 
+                        engineRef.current.setBrush(e.target.value, engineRef.current.brushSize)
+                    }
+                } 
             />
             <input 
                 type="range" 
                 min="1" 
                 max="50" 
-                defaultValue="3" 
+                defaultValue="3"
+                onChange={(e) => {
+                    if (engineRef.current) 
+                        engineRef.current.setBrush(engineRef.current.brushColor, parseInt(e.target.value))
+                    }
+                }
             />
-            <button>Clear Canvas</button>
+            <button onClick={() => engineRef.current?.clear()}>Clear Canvas</button>
         </div>
     )
 }

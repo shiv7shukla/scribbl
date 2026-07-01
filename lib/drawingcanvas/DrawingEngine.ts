@@ -1,3 +1,5 @@
+import { ChangeEvent } from "react";
+
 export class DrawingEngine {
     public canvas: HTMLCanvasElement;
     public ctx: CanvasRenderingContext2D | null;
@@ -59,7 +61,7 @@ export class DrawingEngine {
         };
     }
 
-    startDrawing(e) {
+    startDrawing(e: ChangeEvent) {
         this.isDrawing = true;
         const { x, y } = this.getCoordinates(e);
         this.lastX = x;
