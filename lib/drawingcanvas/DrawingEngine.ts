@@ -1,4 +1,4 @@
-import { ChangeEvent } from "react";
+import { SmoothBrush } from "./SmoothBrush";
 
 export class DrawingEngine {
     public canvas: HTMLCanvasElement;
@@ -6,9 +6,7 @@ export class DrawingEngine {
     public isDrawing: boolean;
     public lastX: number;
     public lastY: number;
-    public brushColor: string;
-    public brushSize: number;
-    public brushOpacity: number
+    public smoothBrush: SmoothBrush;
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
@@ -18,10 +16,12 @@ export class DrawingEngine {
         this.lastY = 0;
 
         // Default brush settings
-        this.brushColor = "#000000";
-        this.brushSize = 3;
-        this.brushOpacity = 1;
-
+        this.smoothBrush = new SmoothBrush(canvas);
+        if (this.smoothBrush.ctx){
+            this.smoothBrush.ctx.strokeStyle = "#000000";
+            this.smoothBrush.ctx.lineWidth = 3;
+            this.smoothBrush.ctx.globalAlpha = 1;
+        }
         this.setupEventListeners();
         this.configureContext();
     }
@@ -32,6 +32,11 @@ export class DrawingEngine {
         this.ctx.lineCap = "round";
         this.ctx.lineJoin = "round";
         this.ctx.imageSmoothingEnabled = true;
+
+        if (this.smoothBrush.ctx) {
+            this.smoothBrush.ctx.lineCap = "round";
+            this.smoothBrush.ctx.lineJoin = "round";
+        }
     }
 
     setupEventListeners() {
@@ -43,12 +48,12 @@ export class DrawingEngine {
 
         // Touch events for mobile support
         this.canvas.addEventListener("touchstart", (e) => {
-        e.preventDefault();
-        this.startDrawing(e.touches[0]);
+            e.preventDefault();
+            this.startDrawing(e.touches[0]);
         });
         this.canvas.addEventListener("touchmove", (e) => {
-        e.preventDefault();
-        this.draw(e.touches[0]);
+            e.preventDefault();
+            this.draw(e.touches[0]);
         });
         this.canvas.addEventListener("touchend", () => this.stopDrawing());
     }
@@ -56,12 +61,12 @@ export class DrawingEngine {
     getCoordinates(e) {
         const rect = this.canvas.getBoundingClientRect();
         return {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top,
         };
     }
 
-    startDrawing(e: ChangeEvent) {
+    startDrawing(e) {
         this.isDrawing = true;
         const { x, y } = this.getCoordinates(e);
         this.lastX = x;
@@ -70,8 +75,8 @@ export class DrawingEngine {
         // Start a new path
         if (!this.ctx) return;
 
-        this.ctx.beginPath();
-        this.ctx.moveTo(x, y);
+        this.smoothBrush.reset();
+        this.smoothBrush.addPoint(x, y);
     }
 
     draw(e) {
@@ -80,31 +85,22 @@ export class DrawingEngine {
 
         const { x, y } = this.getCoordinates(e);
 
-        // Configure stroke style
-        this.ctx.strokeStyle = this.brushColor;
-        this.ctx.lineWidth = this.brushSize;
-        this.ctx.globalAlpha = this.brushOpacity;
-
-        // Draw line segment
-        this.ctx.lineTo(x, y);
-        this.ctx.stroke();
-
-        // Update last position
-        this.lastX = x;
-        this.lastY = y;
+        this.smoothBrush.addPoint(x, y);
     }
 
     stopDrawing() {
         if (this.isDrawing && this.ctx) {
-        this.isDrawing = false;
-        this.ctx.closePath();
+            this.isDrawing = false;
+            this.smoothBrush.reset();
         }
     }
 
     setBrush(color: string, size: number, opacity = 1) {
-        this.brushColor = color;
-        this.brushSize = size;
-        this.brushOpacity = opacity;
+        if (this.smoothBrush.ctx) {
+            this.smoothBrush.ctx.strokeStyle = color;
+            this.smoothBrush.ctx.lineWidth = size;
+            this.smoothBrush.ctx.globalAlpha = opacity;
+        }
     }
 
     clear() {

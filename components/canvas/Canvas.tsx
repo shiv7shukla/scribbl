@@ -17,12 +17,12 @@ export default function Canvas() {
         if (!ctx) return;
 
         const dpr = window.devicePixelRatio || 1;
-        const rect = canvas.getBoundingClientRect();
         const width = divRef.current?.getBoundingClientRect().width;
         const height = divRef.current?.getBoundingClientRect().height;
+
         if (width && height) {
-        canvas.width = width * dpr;
-        canvas.height = height * dpr;
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
         }
 
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);

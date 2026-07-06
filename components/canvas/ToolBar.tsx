@@ -1,4 +1,5 @@
-import React from 'react'
+"use client";
+import React, { useState } from 'react'
 import { DrawingEngine } from '@/lib/drawingcanvas/DrawingEngine';
 import { Trash2 } from 'lucide-react';
 
@@ -7,6 +8,8 @@ type ToolbarProps = {
 };
 
 const ToolBar = ({ engineRef }: ToolbarProps) => {
+    const [color, setColor] = useState("");
+    const [size, setSize] = useState(0);
     return (
         <div className='h-full w-full flex justify-around'>
             <input 
@@ -14,8 +17,9 @@ const ToolBar = ({ engineRef }: ToolbarProps) => {
                 defaultValue="#000000" 
                 className='h-20 w-20 cursor-context-pointer'
                 onChange={(e) => {
+                    setColor(e.target.value);
                     if (engineRef.current) 
-                        engineRef.current.setBrush(e.target.value, engineRef.current.brushSize)
+                        engineRef.current.setBrush(color, size);
                     }
                 } 
             />
@@ -26,8 +30,9 @@ const ToolBar = ({ engineRef }: ToolbarProps) => {
                 defaultValue="3"
                 className='w-60 cursor-grab'
                 onChange={(e) => {
+                    setSize(parseInt(e.target.value));
                     if (engineRef.current) 
-                        engineRef.current.setBrush(engineRef.current.brushColor, parseInt(e.target.value))
+                        engineRef.current.setBrush(color, size);
                     }
                 }
             />
