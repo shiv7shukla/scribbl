@@ -4,9 +4,10 @@ import { DrawingEngine } from "@/lib/drawingcanvas/DrawingEngine";
 import { useEffect, useRef } from "react";
 import ToolBar from "./ToolBar";
 
-export default function Canvas(){
-    const canvasRef = useRef<HTMLCanvasElement>(null);
+export default function Canvas() {
     const engineRef = useRef<DrawingEngine>(null);
+    const divRef = useRef<HTMLDivElement>(null);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -17,22 +18,33 @@ export default function Canvas(){
 
         const dpr = window.devicePixelRatio || 1;
         const rect = canvas.getBoundingClientRect();
+        const width = divRef.current?.getBoundingClientRect().width;
+        const height = divRef.current?.getBoundingClientRect().height;
+        if (width && height) {
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        }
 
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.height * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-        ctx.scale(dpr, dpr);
-
-        canvas.style.width = `${rect.width}px`;
-        canvas.style.height = `${rect.height}px`;
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${height}px`;
+        canvas.style.backgroundColor = "snow";
 
         engineRef.current = new DrawingEngine(canvas);
     }, []);
 
-    return(
-        <div className="canvas-container">
-            <ToolBar engineRef={engineRef} />
-            <canvas id="drawingCanvas" ref={canvasRef}></canvas>
+    return (
+        <div className="h-full w-full">
+            <div
+                className="h-[87%] w-full flex flex-col justify-between gap-2"
+                ref={divRef}
+            >
+                <canvas id="drawingCanvas" ref={canvasRef} className="w-full" />
+                <div className="flex h-auto w-full items-center justify-center">
+                    <ToolBar engineRef={engineRef} />
+                </div>
+            </div>
         </div>
-    )
+    );
 }
