@@ -1,5 +1,5 @@
-import { createServer } from "node:http";
 import next from "next";
+import { createServer } from "node:http";
 import { Server } from "socket.io";
 
 const dev = process.env.NODE_ENV !== "production";
@@ -15,10 +15,10 @@ app.prepare().then(() => {
   const io = new Server(httpServer);
 
   io.on("connection", (socket) => {
-    socket.on('draw-outgoing', (data) => {
-    // Receive drawing data and broadcast it to other clients
-    socket.broadcast.emit('draw-incoming', data);
-  });
+    socket.on("draw-outgoing", (data) => {
+      console.log("received draw-outgoing", data);
+      socket.broadcast.emit("draw-incoming", data);
+    });
   });
 
   httpServer

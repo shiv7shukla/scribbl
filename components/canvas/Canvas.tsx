@@ -1,5 +1,6 @@
 "use client";
 
+import { socket } from "@/app/socket";
 import { DrawingEngine } from "@/lib/drawingcanvas/DrawingEngine";
 import { useEffect, useRef } from "react";
 import ToolBar from "./ToolBar";
@@ -10,6 +11,10 @@ export default function Canvas() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
+        if (!socket.connected) {
+            socket.connect();
+        }
+
         const canvas = canvasRef.current;
         if (!(canvas instanceof HTMLCanvasElement)) return;
 

@@ -1,12 +1,12 @@
 import { SmoothBrush } from "./SmoothBrush";
 
 export class DrawingEngine {
-    private canvas: HTMLCanvasElement;
-    private ctx: CanvasRenderingContext2D | null;
-    private isDrawing: boolean;
-    private lastX: number;
-    private lastY: number;
-    private smoothBrush: SmoothBrush;
+    public canvas: HTMLCanvasElement;
+    public ctx: CanvasRenderingContext2D | null;
+    public isDrawing: boolean;
+    public lastX: number;
+    public lastY: number;
+    public smoothBrush: SmoothBrush;
 
     private onMouseDown!: (e: MouseEvent) => void;
     private onMouseMove!: (e: MouseEvent) => void;
@@ -127,7 +127,9 @@ export class DrawingEngine {
         if (!this.ctx) return;
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
-    // socket.on('draw', (data) => {
+}
+
+socket.on('draw-incoming', (data) => {
     // // Draw based on the received drawing information
     // context.lineJoin = 'round';
     // context.lineCap = 'round';
@@ -136,5 +138,5 @@ export class DrawingEngine {
     // context.moveTo(data.x1, data.y1);
     // context.lineTo(data.x2, data.y2);
     // context.stroke();
-// });
-}
+    console.log(data);
+});

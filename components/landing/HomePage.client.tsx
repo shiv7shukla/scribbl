@@ -1,11 +1,11 @@
 "use client";
 
 import { socket } from "@/app/socket";
-import InputBox from "@/components/landing/LandingPage.client";
+import InputBox from "@/components/landing/InputBox.client";
 import { Toaster } from "@/components/ui/sonner";
 import { useEffect, useState } from "react";
 
-export default function HomePageClient() {
+export default function HomePage() {
   const [isConnected, setIsConnected] = useState(false);
   const [transport, setTransport] = useState("N/A");
 
