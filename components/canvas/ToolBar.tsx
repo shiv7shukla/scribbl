@@ -8,33 +8,36 @@ type ToolbarProps = {
 };
 
 const ToolBar = ({ engineRef }: ToolbarProps) => {
-    const [color, setColor] = useState("");
-    const [size, setSize] = useState(0);
+    const [color, setColor] = useState("#000000");
+    const [size, setSize] = useState(3);
+
+    const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const nextColor = e.target.value;
+        setColor(nextColor);
+        engineRef.current?.setBrush(nextColor, size);
+    };
+
+    const handleSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const nextSize = Number.parseInt(e.target.value, 10);
+        setSize(nextSize);
+        engineRef.current?.setBrush(color, nextSize);
+    };
+
     return (
         <div className='h-full w-full flex justify-around'>
             <input 
                 type="color" 
-                defaultValue="#000000" 
+                value={color}
                 className='h-20 w-20 cursor-context-pointer'
-                onChange={(e) => {
-                    setColor(e.target.value);
-                    if (engineRef.current) 
-                        engineRef.current.setBrush(color, size);
-                    }
-                } 
+                onChange={handleColorChange}
             />
             <input 
                 type="range" 
                 min="1" 
-                max="50" 
-                defaultValue="3"
-                className='w-60 cursor-grab'
-                onChange={(e) => {
-                    setSize(parseInt(e.target.value));
-                    if (engineRef.current) 
-                        engineRef.current.setBrush(color, size);
-                    }
-                }
+                max="20" 
+                value={size}
+                className='w-40 cursor-grab'
+                onChange={handleSizeChange}
             />
             <button onClick={() => engineRef.current?.clear()} >
                 <Trash2 className='cursor-pointer' size={30}/>

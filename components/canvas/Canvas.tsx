@@ -33,6 +33,11 @@ export default function Canvas() {
         canvas.style.border = `1px solid #000`;
 
         engineRef.current = new DrawingEngine(canvas);
+
+        return () => {
+            engineRef.current?.destroy();
+            engineRef.current = null;
+        }
     }, []);
 
     return (

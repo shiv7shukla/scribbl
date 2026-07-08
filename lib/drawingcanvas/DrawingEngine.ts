@@ -1,12 +1,20 @@
 import { SmoothBrush } from "./SmoothBrush";
 
 export class DrawingEngine {
-    public canvas: HTMLCanvasElement;
-    public ctx: CanvasRenderingContext2D | null;
-    public isDrawing: boolean;
-    public lastX: number;
-    public lastY: number;
-    public smoothBrush: SmoothBrush;
+    private canvas: HTMLCanvasElement;
+    private ctx: CanvasRenderingContext2D | null;
+    private isDrawing: boolean;
+    private lastX: number;
+    private lastY: number;
+    private smoothBrush: SmoothBrush;
+
+    private onMouseDown!: (e: MouseEvent) => void;
+    private onMouseMove!: (e: MouseEvent) => void;
+    private onMouseUp!: () => void;
+    private onMouseOut!: () => void;
+    private onTouchStart!: (e: TouchEvent) => void;
+    private onTouchMove!: (e: TouchEvent) => void;
+    private onTouchEnd!: () => void;
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
@@ -14,14 +22,8 @@ export class DrawingEngine {
         this.isDrawing = false;
         this.lastX = 0;
         this.lastY = 0;
-
-        // Default brush settings
         this.smoothBrush = new SmoothBrush(canvas);
-        if (this.smoothBrush.ctx){
-            this.smoothBrush.ctx.strokeStyle = "#000000";
-            this.smoothBrush.ctx.lineWidth = 3;
-            this.smoothBrush.ctx.globalAlpha = 1;
-        }
+
         this.setupEventListeners();
         this.configureContext();
     }
@@ -40,25 +42,43 @@ export class DrawingEngine {
     }
 
     setupEventListeners() {
-        // Mouse events
-        this.canvas.addEventListener("mousedown", (e) => this.startDrawing(e));
-        this.canvas.addEventListener("mousemove", (e) => this.draw(e));
-        this.canvas.addEventListener("mouseup", () => this.stopDrawing());
-        this.canvas.addEventListener("mouseout", () => this.stopDrawing());
+        this.onMouseDown = (e) => this.startDrawing(e);
+        this.onMouseMove = (e) => this.draw(e);
+        this.onMouseUp = () => this.stopDrawing();
+        this.onMouseOut = () => this.stopDrawing();
 
-        // Touch events for mobile support
-        this.canvas.addEventListener("touchstart", (e) => {
+        this.onTouchStart = (e) => {
             e.preventDefault();
             this.startDrawing(e.touches[0]);
-        });
-        this.canvas.addEventListener("touchmove", (e) => {
+        };
+        this.onTouchMove = (e) => {
             e.preventDefault();
             this.draw(e.touches[0]);
-        });
-        this.canvas.addEventListener("touchend", () => this.stopDrawing());
+        };
+        this.onTouchEnd = () => this.stopDrawing();
+
+        this.canvas.addEventListener("mousedown", this.onMouseDown);
+        this.canvas.addEventListener("mousemove", this.onMouseMove);
+        this.canvas.addEventListener("mouseup", this.onMouseUp);
+        this.canvas.addEventListener("mouseout", this.onMouseOut);
+
+        this.canvas.addEventListener("touchstart", this.onTouchStart);
+        this.canvas.addEventListener("touchmove", this.onTouchMove);
+        this.canvas.addEventListener("touchend", this.onTouchEnd);
     }
 
-    getCoordinates(e) {
+    destroy() {
+        this.canvas.removeEventListener("mousedown", this.onMouseDown);
+        this.canvas.removeEventListener("mousemove", this.onMouseMove);
+        this.canvas.removeEventListener("mouseup", this.onMouseUp);
+        this.canvas.removeEventListener("mouseout", this.onMouseOut);
+
+        this.canvas.removeEventListener("touchstart", this.onTouchStart);
+        this.canvas.removeEventListener("touchmove", this.onTouchMove);
+        this.canvas.removeEventListener("touchend", this.onTouchEnd);
+    }
+
+    getCoordinates(e: MouseEvent | Touch) {
         const rect = this.canvas.getBoundingClientRect();
         return {
             x: e.clientX - rect.left,
@@ -66,7 +86,7 @@ export class DrawingEngine {
         };
     }
 
-    startDrawing(e) {
+    startDrawing(e: MouseEvent | Touch) {
         this.isDrawing = true;
         const { x, y } = this.getCoordinates(e);
         this.lastX = x;
@@ -75,11 +95,11 @@ export class DrawingEngine {
         // Start a new path
         if (!this.ctx) return;
 
-        this.smoothBrush.reset();
         this.smoothBrush.addPoint(x, y);
+        this.smoothBrush.reset();
     }
 
-    draw(e) {
+    draw(e: MouseEvent | Touch) {
         if (!this.isDrawing) return;
         if (!this.ctx) return;
 
@@ -89,7 +109,7 @@ export class DrawingEngine {
     }
 
     stopDrawing() {
-        if (this.isDrawing && this.ctx) {
+        if (this.isDrawing) {
             this.isDrawing = false;
             this.smoothBrush.reset();
         }

@@ -22,6 +22,12 @@ export class SmoothBrush{
         if (this.points.length >= 3) {
             this.drawSmoothedLine();
         }
+        // else if (this.points.length === 2 && this.ctx) {
+        //    this.ctx.beginPath();
+        //    this.ctx.moveTo(this.points[0].x, this.points[0].y);
+        //    this.ctx.lineTo(this.points[1].x, this.points[1].y);
+        //    this.ctx.stroke();
+        // }
     }
 
     drawSmoothedLine() {
