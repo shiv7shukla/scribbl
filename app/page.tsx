@@ -1,19 +1,5 @@
-import InputBox from "@/components/landing/LandingPage.client";
-import { Toaster } from "@/components/ui/sonner";
+import HomePageClient from "@/components/landing/HomePageClient";
 
 export default function Page() {
-  return (
-    <div className="min-h-screen bg-background">
-      <Toaster position="top-center" />
-      <header className="max-w-6xl mx-auto px-4 pt-16 pb-8">
-        <h1 className="font-display text-4xl font-semibold tracking-tight">
-          scribbl
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Draw. Guess. Repeat.
-        </p>
-      </header>
-      <InputBox />
-    </div>
-  );
+  return <HomePageClient />;
 }

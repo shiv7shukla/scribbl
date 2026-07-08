@@ -1,0 +1,58 @@
+"use client";
+
+import { socket } from "@/app/socket";
+import InputBox from "@/components/landing/LandingPage.client";
+import { Toaster } from "@/components/ui/sonner";
+import { useEffect, useState } from "react";
+
+export default function HomePageClient() {
+  const [isConnected, setIsConnected] = useState(false);
+  const [transport, setTransport] = useState("N/A");
+
+  useEffect(() => {
+    const onConnect = () => {
+      setIsConnected(true);
+      setTransport(socket.io.engine.transport.name);
+
+      socket.io.engine.on("upgrade", (transport) => {
+        setTransport(transport.name);
+      });
+    };
+
+    const onDisconnect = () => {
+      setIsConnected(false);
+      setTransport("N/A");
+    };
+
+    if (socket.connected) {
+      onConnect();
+    }
+
+    socket.on("connect", onConnect);
+    socket.on("disconnect", onDisconnect);
+    socket.connect();
+
+    return () => {
+      socket.off("connect", onConnect);
+      socket.off("disconnect", onDisconnect);
+    };
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Toaster position="top-center" />
+      <header className="max-w-6xl mx-auto px-4 pt-16 pb-8">
+        <h1 className="font-display text-4xl font-semibold tracking-tight">
+          scribbl
+        </h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Draw. Guess. Repeat.
+        </p>
+        <p className="mt-3 text-xs text-muted-foreground">
+          Socket: {isConnected ? `${transport} connected` : "connecting"}
+        </p>
+      </header>
+      <InputBox />
+    </div>
+  );
+}

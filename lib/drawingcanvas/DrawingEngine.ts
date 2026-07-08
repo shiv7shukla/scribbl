@@ -127,4 +127,14 @@ export class DrawingEngine {
         if (!this.ctx) return;
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
+    // socket.on('draw', (data) => {
+    // // Draw based on the received drawing information
+    // context.lineJoin = 'round';
+    // context.lineCap = 'round';
+    // context.lineWidth = 2;
+    // context.beginPath();
+    // context.moveTo(data.x1, data.y1);
+    // context.lineTo(data.x2, data.y2);
+    // context.stroke();
+// });
 }
