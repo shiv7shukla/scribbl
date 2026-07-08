@@ -2,7 +2,7 @@ import Canvas from "@/components/canvas/Canvas";
 
 const page = () => {
     return (
-        <div className="min-h-screen w-full bg-amber-600 p-4">
+        <div className="min-h-screen w-full bg-amber-600 p-4 flex-col items-center">
             <div className="h-[8vh] max-w-[1600px] rounded-3xl bg-blue-400 "></div>
             <div className="mx-auto flex min-h-[85vh] max-w-[1600px] flex-col gap-4 p-4 lg:flex-row">
                 <div className="order-2 lg:order-1 lg:flex-1 rounded-3xl bg-white/80 p-4 shadow-lg">

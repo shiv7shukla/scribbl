@@ -30,6 +30,7 @@ export default function Canvas() {
         canvas.style.width = `${width}px`;
         canvas.style.height = `${height}px`;
         canvas.style.backgroundColor = "snow";
+        canvas.style.border = `1px solid #000`;
 
         engineRef.current = new DrawingEngine(canvas);
     }, []);
