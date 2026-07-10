@@ -7,36 +7,8 @@ import { useEffect, useState } from "react";
 
 export default function HomePage() {
   const [isConnected, setIsConnected] = useState(false);
-  const [transport, setTransport] = useState("N/A");
 
-  useEffect(() => {
-    const onConnect = () => {
-      setIsConnected(true);
-      setTransport(socket.io.engine.transport.name);
-
-      socket.io.engine.on("upgrade", (transport) => {
-        setTransport(transport.name);
-      });
-    };
-
-    const onDisconnect = () => {
-      setIsConnected(false);
-      setTransport("N/A");
-    };
-
-    if (socket.connected) {
-      onConnect();
-    }
-
-    socket.on("connect", onConnect);
-    socket.on("disconnect", onDisconnect);
-    socket.connect();
-
-    return () => {
-      socket.off("connect", onConnect);
-      socket.off("disconnect", onDisconnect);
-    };
-  }, []);
+  
 
   return (
     <div className="min-h-screen bg-background">
