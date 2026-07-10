@@ -1,4 +1,9 @@
+"use client";
+
+import { useSocket } from "../context/SocketContext";
 import { SmoothBrush } from "./SmoothBrush";
+
+const { socket, isConnected} = useSocket();
 
 export class DrawingEngine {
     public canvas: HTMLCanvasElement;
@@ -42,19 +47,34 @@ export class DrawingEngine {
     }
 
     setupEventListeners() {
-        this.onMouseDown = (e) => this.startDrawing(e);
-        this.onMouseMove = (e) => this.draw(e);
-        this.onMouseUp = () => this.stopDrawing();
-        this.onMouseOut = () => this.stopDrawing();
+        this.onMouseDown = (e) => {
+            const { x, y } = this.getCoordinates(e);
+            this.startDrawing(x, y);
+            socket.emit("mousedown", {x, y});
+        }
+        this.onMouseMove = (e) => {
+            if (!this.isDrawing) return;
+            const { x, y } = this.getCoordinates(e);
+            this.draw(x, y);
+            socket.emit("mousemove", {x, y});
+        }
+        this.onMouseUp = () => {
+            this.stopDrawing();
+           socket.emit("mouseup");
+        }
+        this.onMouseOut = () => {
+            this.stopDrawing();
+           socket.emit("mouseout");
+        }
 
-        this.onTouchStart = (e) => {
-            e.preventDefault();
-            this.startDrawing(e.touches[0]);
-        };
-        this.onTouchMove = (e) => {
-            e.preventDefault();
-            this.draw(e.touches[0]);
-        };
+        // this.onTouchStart = (e) => {
+        //     e.preventDefault();
+        //     this.startDrawing(e.touches[0]);
+        // };
+        // this.onTouchMove = (e) => {
+        //     e.preventDefault();
+        //     this.draw(e.touches[0]);
+        // };
         this.onTouchEnd = () => this.stopDrawing();
 
         this.canvas.addEventListener("mousedown", this.onMouseDown);
@@ -86,9 +106,8 @@ export class DrawingEngine {
         };
     }
 
-    startDrawing(e: MouseEvent | Touch) {
+    startDrawing(x: number, y: number) {
         this.isDrawing = true;
-        const { x, y } = this.getCoordinates(e);
         this.lastX = x;
         this.lastY = y;
 
@@ -99,11 +118,9 @@ export class DrawingEngine {
         this.smoothBrush.reset();
     }
 
-    draw(e: MouseEvent | Touch) {
+    draw(x: number, y: number) {
         if (!this.isDrawing) return;
         if (!this.ctx) return;
-
-        const { x, y } = this.getCoordinates(e);
 
         this.smoothBrush.addPoint(x, y);
     }
@@ -128,15 +145,3 @@ export class DrawingEngine {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 }
-
-socket.on('draw-incoming', (data) => {
-    // // Draw based on the received drawing information
-    // context.lineJoin = 'round';
-    // context.lineCap = 'round';
-    // context.lineWidth = 2;
-    // context.beginPath();
-    // context.moveTo(data.x1, data.y1);
-    // context.lineTo(data.x2, data.y2);
-    // context.stroke();
-    console.log(data);
-});
