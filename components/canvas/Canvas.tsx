@@ -34,15 +34,9 @@ export default function Canvas() {
         canvas.style.backgroundColor = "snow";
         canvas.style.border = `1px solid #000`;
 
-        engineRef.current = new DrawingEngine(canvas);
+        engineRef.current = new DrawingEngine(canvas, socket);
 
-        return () => {
-            engineRef.current?.destroy();
-            engineRef.current = null;
-        }
-    }, []);
-
-    socket.on("draw-event", (payload) => {
+        socket.on("draw-event", (payload) => {
         switch (payload.type){
             case "mousedown":
                 engineRef.current?.startDrawing(payload.x, payload.y);
@@ -58,6 +52,15 @@ export default function Canvas() {
                 break;
         }
     })
+
+        return () => {
+            engineRef.current?.destroy();
+            engineRef.current = null;
+            socket.off("draw-event");
+        }
+    }, []);
+
+    
 
     return (
         <div className="h-full w-full">

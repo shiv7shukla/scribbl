@@ -15,7 +15,7 @@ app.prepare().then(() => {
   const io = new Server(httpServer);
 
   io.on("connection", (socket) => {
-    socket.on("draw-outgoing", (data) => {
+    socket.on("draw-event", (data) => {
       console.log("received draw-outgoing", data);
       socket.broadcast.emit("draw-incoming", data);
     });

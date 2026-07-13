@@ -1,9 +1,5 @@
-"use client";
-
-import { useSocket } from "../context/SocketContext";
+import { Socket } from "socket.io-client";
 import { SmoothBrush } from "./SmoothBrush";
-
-const { socket, isConnected} = useSocket();
 
 export class DrawingEngine {
     public canvas: HTMLCanvasElement;
@@ -12,6 +8,7 @@ export class DrawingEngine {
     public lastX: number;
     public lastY: number;
     public smoothBrush: SmoothBrush;
+    public socket: Socket;
 
     private onMouseDown!: (e: MouseEvent) => void;
     private onMouseMove!: (e: MouseEvent) => void;
@@ -21,12 +18,13 @@ export class DrawingEngine {
     private onTouchMove!: (e: TouchEvent) => void;
     private onTouchEnd!: () => void;
 
-    constructor(canvas: HTMLCanvasElement) {
+    constructor(canvas: HTMLCanvasElement, socket: Socket) {
         this.canvas = canvas;
         this.ctx = canvas.getContext("2d");
         this.isDrawing = false;
         this.lastX = 0;
         this.lastY = 0;
+        this.socket = socket;
         this.smoothBrush = new SmoothBrush(canvas);
 
         this.setupEventListeners();
@@ -50,21 +48,21 @@ export class DrawingEngine {
         this.onMouseDown = (e) => {
             const { x, y } = this.getCoordinates(e);
             this.startDrawing(x, y);
-            socket.emit("mousedown", {x, y});
+            this.socket.emit("mousedown", {x, y});
         }
         this.onMouseMove = (e) => {
             if (!this.isDrawing) return;
             const { x, y } = this.getCoordinates(e);
             this.draw(x, y);
-            socket.emit("mousemove", {x, y});
+            this.socket.emit("mousemove", {x, y});
         }
         this.onMouseUp = () => {
             this.stopDrawing();
-           socket.emit("mouseup");
+           this.socket.emit("mouseup");
         }
         this.onMouseOut = () => {
             this.stopDrawing();
-           socket.emit("mouseout");
+           this.socket.emit("mouseout");
         }
 
         // this.onTouchStart = (e) => {
