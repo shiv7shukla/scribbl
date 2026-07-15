@@ -8,7 +8,6 @@ import { toast } from "sonner";
 export default function HomePage() {
     const [name, setName] = useState("");
     const [joinCode, setJoinCode] = useState("");
-    const [copied, setCopied] = useState(false);
     const router = useRouter();
 
     function ensureName(): string | null {
@@ -25,8 +24,7 @@ export default function HomePage() {
       if (!trimmed) return;
 
       const code = String(crypto.randomUUID());
-      setJoinCode(code);
-      toast.success(`Room created!`);
+      router.push(`/lobby?roomCode=${code}&name=${encodeURIComponent(trimmed)}`);
     }
 
     function joinRoom(code: string) {
@@ -34,26 +32,13 @@ export default function HomePage() {
       if (!trimmed) return;
 
       const c = code.trim();
+      if (!c) {
+        toast.error("Enter a room code!");
+        return;
+      }
 
       router.push(`/lobby?roomCode=${c}&name=${encodeURIComponent(trimmed)}`);
     }
-
-    async function handleCopyToClipboard(){
-      if (!joinCode) return;
-
-      try {
-        await navigator.clipboard.writeText(joinCode);
-        setCopied(true);
-        toast.success("Copied room code!");
-
-        // Reset the "Copied!" visual feedback after 3 seconds
-        setTimeout(() => {
-          setCopied(false);
-        }, 3000);
-      } catch (err) {
-        toast.error("Failed to copy code");
-      }
-  };
     
   return (
     <div className="min-h-screen bg-background">
@@ -67,7 +52,7 @@ export default function HomePage() {
         </p>
       </header>
       <main className="mx-auto max-w-3xl px-4 pb-16">
-            <section className="pop-card-lg space-y-6 p-6">
+            <section className="pop-card-lg space-y-6 bg-card p-6">
                 <div>
                     <label className="mb-2 block font-display text-lg">
                         Your nickname
@@ -86,21 +71,14 @@ export default function HomePage() {
                         <div>
                             <p className="font-display text-lg">Create a room</p>
                             <p className="text-sm text-muted-foreground">
-                                Start a new game and share a fresh room code.
+                                Start a new game lobby.
                             </p>
                         </div>
                         <button
                             onClick={createRoom}
-                            className="pop-card pop-press rounded-xl bg-primary px-5 py-3 font-display text-lg text-primary-foreground cursor-pointer"
+                            className="pop-btn-primary pop-press rounded-xl px-5 py-3 font-display text-lg cursor-pointer"
                         >
                             Create
-                        </button>
-                        <button
-                            disabled={!joinCode}
-                            onClick={handleCopyToClipboard}
-                            className="pop-card pop-press rounded-xl bg-primary px-5 py-3 font-display text-lg text-primary-foreground cursor-pointer"
-                        >
-                            {copied ? "Copied!" : "Copy"}
                         </button>
                     </div>
                 </div>
@@ -111,13 +89,13 @@ export default function HomePage() {
                         <input
                             value={joinCode}
                             onChange={(e) => setJoinCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                            placeholder="1234"
+                            placeholder="123456"
                             maxLength={6}
                             className="flex-1 rounded-xl border-[3px] border-border bg-input px-4 py-3 text-lg font-bold tracking-widest focus:outline-none focus:ring-4 focus:ring-primary/30"
                         />
                         <button
                             onClick={() => joinRoom(joinCode)}
-                            className="pop-card pop-press rounded-xl bg-primary px-5 py-3 font-display text-lg text-primary-foreground cursor-pointer"
+                            className="pop-btn-primary pop-press rounded-xl px-5 py-3 font-display text-lg cursor-pointer"
                         >
                             Join
                         </button>
