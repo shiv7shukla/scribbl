@@ -35,6 +35,10 @@ const LobbySettingsPanel = ({
     }
   }
 
+  const gameStart = () => {
+    
+  }
+
   return (
     <section className="pop-card-lg flex h-full flex-col bg-paper p-6">
       <div className="mb-5 text-center">
@@ -125,7 +129,7 @@ const LobbySettingsPanel = ({
             <button
               type="button"
               disabled={players.length < 2}
-              onClick={() => toast.success("Game would start here!")}
+              onClick={gameStart}
               className="pop-btn-primary pop-press px-8 py-4 font-display text-2xl disabled:opacity-50"
             >
               ▶ Start Game

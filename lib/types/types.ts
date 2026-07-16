@@ -21,3 +21,20 @@ export type LobbySettings = {
   useCustomWordsOnly: boolean;
   hints: number;
 };
+
+export type gameState = {
+  roomCode: string;
+  messages: {sender: string, message: string}[];
+  totalRounds: number;
+  currentRound: number;
+  maxPlayers: number;
+  players: {username: string, color: string}[];
+};
+
+export type gameActions = {
+  newMessage: (newMsg: [{sender: string, message: string}]) => void;
+  incrementRound: () => void;
+  newPlayers: (newPlayer: [{username: string, color: string}]) => void;
+};
+
+export type gameStore = gameState & gameActions;
