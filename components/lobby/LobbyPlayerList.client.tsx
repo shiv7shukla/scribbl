@@ -4,16 +4,7 @@ import { Player } from '@/lib/types/types';
 import { Users, Crown } from 'lucide-react';
 import React, { useMemo } from 'react'
 
-const LobbyPlayerList = ({
-  players,
-  maxPlayers,
-  meId,
-}: {
-  players: Player[];
-  maxPlayers: number;
-  meId: string;
-}) => {
-    const PLAYER_COLORS = [
+const PLAYER_COLORS = [
         "#e74c3c",
         "#3498db",
         "#2ecc71",
@@ -26,7 +17,18 @@ const LobbyPlayerList = ({
         "#95a5a6",
         "#16a085",
         "#d35400",
-        ];
+    ];
+
+const LobbyPlayerList = ({
+  players,
+  maxPlayers,
+  meId,
+}: {
+  players: Player[];
+  maxPlayers: number;
+  meId: string;
+}) => {
+    
     
     const emptySlots = Math.max(0, maxPlayers - players.length);
     

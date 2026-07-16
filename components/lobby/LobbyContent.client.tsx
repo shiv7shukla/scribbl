@@ -35,11 +35,14 @@ const PLAYER_COLORS = [
         "#d35400",
         ];
 
+const MOCK_PLAYERS: Player[] = [
+  { id: "2", name: "SketchySam", color: PLAYER_COLORS[1], isHost: false, score: 0 },
+  { id: "3", name: "DoodleDan", color: PLAYER_COLORS[2], isHost: false, score: 0 },
+];
+
 export default function LobbyContent() {
   const searchParams = useSearchParams();
   const roomCode = searchParams.get("roomCode") ?? "ABC123";
-  
-
   const [settings, setSettings] = useState<LobbySettings>({
     rounds: 3,
     drawTime: 80,
@@ -48,10 +51,6 @@ export default function LobbyContent() {
     useCustomWordsOnly: false,
     hints: 2,
   });
-  const MOCK_PLAYERS: Player[] = [
-        { id: "2", name: "SketchySam", color: PLAYER_COLORS[1], isHost: false, score: 0 },
-        { id: "3", name: "DoodleDan", color: PLAYER_COLORS[2], isHost: false, score: 0 },
-    ];
   const myName = searchParams.get("name") ?? "Guest";
       const me: Player = useMemo(
           () => ({
@@ -64,7 +63,7 @@ export default function LobbyContent() {
           [myName],
     );
   
-      const players = useMemo(() => [me, ...MOCK_PLAYERS], [me]);
+  const players = useMemo(() => [me, ...MOCK_PLAYERS], [me]);
 
   return (
     <div className="min-h-screen bg-background">

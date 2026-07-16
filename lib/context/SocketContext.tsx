@@ -23,26 +23,28 @@ export function SocketProvider({ children }: SocketProps){
     const onConnect = () => {
       setIsConnected(true);
       setTransport(socket.io.engine.transport.name);
-
-      socket.io.engine.on("upgrade", (transport) => {
-        setTransport(transport.name);
-      });
     };
-
+    
+    const onUpgrade = (transport: { name: string }) => {
+      setTransport(transport.name);
+    }
+    
     const onDisconnect = () => {
       setIsConnected(false);
       setTransport("N/A");
     };
-
+    
     if (socket.connected) onConnect();
-
+    
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
+    socket.io.engine.on("upgrade", onUpgrade);
     socket.connect();
 
     return () => {
       socket.off("connect", onConnect);
       socket.off("disconnect", onDisconnect);
+      socket.off("upgrade", onUpgrade);
     };
   }, []);
 
@@ -52,8 +54,6 @@ export function SocketProvider({ children }: SocketProps){
     </SocketContext.Provider>
   )
 }
-
-// export const useSocket = () => useContext(SocketContext);
 
 export function useSocket () {
   const context = useContext(SocketContext);

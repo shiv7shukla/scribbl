@@ -12,7 +12,7 @@ const handler = app.getRequestHandler();
 app.prepare().then(() => {
   const httpServer = createServer(handler);
 
-  const io = new Server(httpServer);
+  const io = new Server(httpServer, { transports: ["websocket"] });
 
   io.on("connection", (socket) => {
     socket.on("draw-event", (data) => {
