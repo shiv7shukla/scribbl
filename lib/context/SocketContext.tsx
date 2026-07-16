@@ -38,13 +38,13 @@ export function SocketProvider({ children }: SocketProps){
     
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
-    socket.io.engine.on("upgrade", onUpgrade);
+    // socket.io.engine.on("upgrade", onUpgrade);
     socket.connect();
 
     return () => {
       socket.off("connect", onConnect);
       socket.off("disconnect", onDisconnect);
-      socket.off("upgrade", onUpgrade);
+      // socket.off("upgrade", onUpgrade);
     };
   }, []);
 
