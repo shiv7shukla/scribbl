@@ -128,3 +128,58 @@
     @apply font-sans;
   }
 }
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-geist-sans), ui-sans-serif, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .pop-card {
+    border: 3px solid var(--foreground);
+    border-radius: var(--radius-xl);
+    box-shadow: 4px 4px 0 0 var(--foreground);
+  }
+
+  .pop-card-lg {
+    border: 3px solid var(--foreground);
+    border-radius: 1.25rem;
+    box-shadow: 6px 6px 0 0 var(--foreground);
+  }
+
+  .pop-btn {
+    border: 3px solid var(--foreground);
+    border-radius: var(--radius-xl);
+    box-shadow: 4px 4px 0 0 var(--foreground);
+    background-color: var(--card);
+    color: var(--foreground);
+  }
+
+  .pop-btn-primary {
+    border: 3px solid var(--foreground);
+    border-radius: var(--radius-xl);
+    box-shadow: 4px 4px 0 0 var(--foreground);
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  .pop-btn-selected {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    border-color: var(--foreground);
+  }
+
+  .pop-press {
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+  }
+
+  .pop-press:active:not(:disabled) {
+    transform: translate(3px, 3px);
+    box-shadow: 1px 1px 0 0 var(--foreground);
+  }
+
+  .bg-paper {
+    background: var(--card);
+  }
+}

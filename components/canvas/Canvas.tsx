@@ -3,11 +3,13 @@
 import { DrawingEngine } from "@/lib/drawingcanvas/DrawingEngine";
 import { useEffect, useRef } from "react";
 import ToolBar from "./ToolBar";
+import { useSocket } from "@/lib/context/SocketContext";
 
 export default function Canvas() {
     const engineRef = useRef<DrawingEngine>(null);
     const divRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const {socket, isConnected} = useSocket();
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -32,11 +34,29 @@ export default function Canvas() {
         canvas.style.backgroundColor = "snow";
         canvas.style.border = `1px solid #000`;
 
-        engineRef.current = new DrawingEngine(canvas);
+        engineRef.current = new DrawingEngine(canvas, socket);
+
+        socket.on("draw-event", (payload) => {
+        switch (payload.type){
+            case "mousedown":
+                engineRef.current?.startDrawing(payload.x, payload.y);
+                break;
+            case "mousemove":
+                engineRef.current?.draw(payload.x, payload.y);
+                break;
+            case "mouseup":
+                engineRef.current?.stopDrawing();
+                break;
+            case "mouseout":
+                engineRef.current?.stopDrawing();
+                break;
+        }
+    })
 
         return () => {
             engineRef.current?.destroy();
             engineRef.current = null;
+            socket.off("draw-event");
         }
     }, []);
 

@@ -34,7 +34,7 @@ const ToolBar = ({ engineRef }: ToolbarProps) => {
             <input 
                 type="range" 
                 min="1" 
-                max="20" 
+                max="100" 
                 value={size}
                 className='w-40 cursor-grab'
                 onChange={handleSizeChange}
