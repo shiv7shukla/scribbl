@@ -24,7 +24,7 @@ export default function HomePage() {
       if (!trimmed) return;
 
       const code = String(crypto.randomUUID());
-      router.push(`/lobby?roomCode=${code}&name=${encodeURIComponent(trimmed)}`);
+      router.push(`/room/${code}`);
     }
 
     function joinRoom(code: string) {
@@ -37,7 +37,7 @@ export default function HomePage() {
         return;
       }
 
-      router.push(`/lobby?roomCode=${c}&name=${encodeURIComponent(trimmed)}`);
+      router.push(`/room/${c}`);
     }
     
   return (
