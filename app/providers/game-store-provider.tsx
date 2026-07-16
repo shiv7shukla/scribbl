@@ -26,12 +26,12 @@ export const GameStoreProvider = ({
   )
 }
 
-export const useCounterStore = <T,>(
+export const useGameStore = <T,>(
   selector: (store: gameStore) => T,
 ): T => {
   const gameStoreContext = useContext(GameStoreContext)
   if (!gameStoreContext) {
-    throw new Error(`useCounterStore must be used within CounterStoreProvider`)
+    throw new Error(`useGameStore must be used within GameStoreProvider`)
   }
 
   return useStore(gameStoreContext, selector)

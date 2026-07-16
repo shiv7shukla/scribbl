@@ -4,9 +4,10 @@
 import { useState, useEffect } from "react";
 import LobbyContent from "../lobby/LobbyContent.client";
 import Canvas from "../canvas/Canvas";
+import { useGameStore } from "@/app/providers/game-store-provider";
 
 const RoomContent = ({ roomId }: { roomId: string }) => {
-  const [gamePhase, setGamePhase] = useState<"lobby" | "playing">("lobby");
+  const gamePhase = useGameStore((state) => state.gamePhase );
 
   useEffect(() => {
     // const onSettings = (s) => updateRoomSettings(s); // your zustand store, per game-store.ts

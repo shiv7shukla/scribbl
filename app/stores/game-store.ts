@@ -8,13 +8,19 @@ export const defaultInitState: gameState = {
     currentRound: 1,
     maxPlayers: 8,
     players: [],
+    gamePhase: "lobby",
+    drawTime: 80
 }
 
 export const createGameStore = ( initState: gameState = defaultInitState ) => {
     return createStore<gameStore>()((set) => ({
         ...initState,
-        newMessage: (newMsg) => set((state) => ({ messages: [...state.messages, ...newMsg] })),
+        changeGamePhase: () => set((state) => ({ gamePhase: "gaming" })),
+        setDrawTime: (drawTime) => set((state) => ({ drawTime: drawTime})),
+        setMaxPlayers: (maxPlayers) => set((state) => ({ maxPlayers: maxPlayers })),
+        setTotalRounds: (totalRounds) => set((state) => ({ totalRounds: totalRounds })),
         incrementRound: () => set((state) => ({ currentRound: state.currentRound + 1 })),
-        newPlayers: (newPlayer) => set((state) => ({ players: [...state.players, ...newPlayer]}))
+        newMessage: (newMsg) => set((state) => ({ messages: [...state.messages, ...newMsg] })),
+        newPlayers: (newPlayer) => set((state) => ({ players: [...state.players, ...newPlayer]})),
     }))
 }

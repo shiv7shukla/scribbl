@@ -29,12 +29,18 @@ export type gameState = {
   currentRound: number;
   maxPlayers: number;
   players: {username: string, color: string}[];
+  gamePhase: string;
+  drawTime: number;
 };
 
 export type gameActions = {
-  newMessage: (newMsg: [{sender: string, message: string}]) => void;
+  newMessage: (newMsg: {sender: string, message: string} []) => void;
   incrementRound: () => void;
-  newPlayers: (newPlayer: [{username: string, color: string}]) => void;
+  changeGamePhase: () => void;
+  setDrawTime: (time: number) => void;
+  setTotalRounds: (totalRounds: number) => void;
+  setMaxPlayers: (maxPlayers: number) => void;
+  newPlayers: (newPlayer: {username: string, color: string} []) => void;
 };
 
 export type gameStore = gameState & gameActions;

@@ -3,12 +3,14 @@ import React, { useMemo } from 'react'
 import LobbySettingsControl from './LobbySettingsControl.client';
 import { Copy } from 'lucide-react';
 import { toast } from 'sonner';
+import { useGameStore } from '@/app/providers/game-store-provider';
+import { useShallow } from 'zustand/shallow';
 
 const LobbySettingsPanel = ({
   roomCode,
   settings,
   isHost,
-  players,
+  // players,
   onSettingsChange,
 }: {
   roomCode: string;
@@ -35,6 +37,24 @@ const LobbySettingsPanel = ({
     }
   }
 
+  const { 
+    totalRounds, 
+    maxPlayers, 
+    players,
+    drawTime, 
+    setDrawTime, 
+    setTotalRounds, 
+    setMaxPlayers 
+  } = useGameStore(useShallow((state) => ({ 
+    totalRounds: state.totalRounds,
+    maxPlayers: state.maxPlayers,
+    players: state.players,
+    drawTime: state.drawTime,
+    setDrawTime: state.setDrawTime,
+    setTotalRounds: state.setTotalRounds,
+    setMaxPlayers: state.setMaxPlayers,
+   })));
+
   const gameStart = () => {
     
   }
@@ -48,7 +68,7 @@ const LobbySettingsPanel = ({
         <h1 className="font-display text-3xl">{roomCode || "—"}</h1>
         <div className="mt-2 flex items-center justify-center gap-2">
           <p className="text-sm font-bold text-muted-foreground">
-            {players.length}/{settings.maxPlayers} players ·{" "}
+            {players.length}/{maxPlayers} players ·{" "}
           </p>
           <button
             type="button"
@@ -64,24 +84,24 @@ const LobbySettingsPanel = ({
       <div className="grid flex-1 content-start gap-3 sm:grid-cols-2">
         <LobbySettingsControl
           label="Rounds"
-          value={settings.rounds}
+          value={totalRounds}
           options={[2, 3, 4, 5, 6, 8]}
           disabled={!isHost}
-          onChange={(rounds) => onSettingsChange({ rounds })}
+          onChange={(rounds) => setTotalRounds( rounds )}
         />
         <LobbySettingsControl
           label="Draw time (s)"
-          value={settings.drawTime}
+          value={drawTime}
           options={[40, 60, 80, 100, 120, 150]}
           disabled={!isHost}
-          onChange={(drawTime) => onSettingsChange({ drawTime })}
+          onChange={(drawTime) => setDrawTime( drawTime )}
         />
         <LobbySettingsControl
           label="Max players"
-          value={settings.maxPlayers}
+          value={maxPlayers}
           options={[4, 6, 8, 10, 12]}
           disabled={!isHost}
-          onChange={(maxPlayers) => onSettingsChange({ maxPlayers })}
+          onChange={(maxPlayers) => setMaxPlayers( maxPlayers )}
         />
         <LobbySettingsControl
           label="Hints"

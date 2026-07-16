@@ -29,10 +29,8 @@ const LobbyPlayerList = ({
   meId: string;
 }) => {
     
-    
     const emptySlots = Math.max(0, maxPlayers - players.length);
     
-
     return (
     <aside className="pop-card-lg flex h-full flex-col bg-paper p-4">
         <div className="mb-4 flex items-center gap-2 border-b-2 border-border/60 pb-3">
