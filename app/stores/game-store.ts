@@ -1,7 +1,7 @@
-import { gameState, gameStore } from "@/lib/types/types";
+import { gameStore, sharedGameState } from "@/lib/types/types";
 import { createStore } from "zustand";
 
-export const defaultInitState: gameState = {
+export const defaultInitState: sharedGameState = {
     roomCode: "",
     messages: [],
     totalRounds: 3,
@@ -9,10 +9,12 @@ export const defaultInitState: gameState = {
     maxPlayers: 8,
     players: [],
     gamePhase: "lobby",
-    drawTime: 80
+    drawTime: 80,
+    guessWord: "",
+    playerID: "",
 }
 
-export const createGameStore = ( initState: gameState = defaultInitState ) => {
+export const createGameStore = ( initState: sharedGameState = defaultInitState ) => {
     return createStore<gameStore>()((set) => ({
         ...initState,
         actions: {

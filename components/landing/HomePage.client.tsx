@@ -10,7 +10,7 @@ export default function HomePage() {
     const [name, setName] = useState("");
     const [joinCode, setJoinCode] = useState("");
     const router = useRouter();
-    const { setRoomCode } = useGameStore((state) => state);
+    const { setRoomCode } = useGameStore((state) => state.actions);
 
     function ensureName(): string | null {
       const trimmed = name.trim().slice(0, 20);

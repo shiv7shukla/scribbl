@@ -8,8 +8,10 @@ import { useGameStore } from "@/app/providers/game-store-provider";
 
 const RoomContent = ({ roomId }: { roomId: string }) => {
   const gamePhase = useGameStore((state) => state.gamePhase );
+  const { setRoomCode } = useGameStore((state) => state.actions);
 
   useEffect(() => {
+    setRoomCode(roomId);
     // const onSettings = (s) => updateRoomSettings(s); // your zustand store, per game-store.ts
     // const onStroke = (stroke) => appendStroke(stroke);
     // const onGameStart = () => setGamePhase("playing");

@@ -18,6 +18,7 @@ import LobbyChatPanel from "./LobbyChatPanel.client";
 import { Player, ChatMessage, LobbySettings } from "@/lib/types/types";
 import LobbyPlayerList from "./LobbyPlayerList.client";
 import LobbySettingsPanel from "./LobbySettingsPanel.client";
+import { useGameStore } from "@/app/providers/game-store-provider";
 
 
 const PLAYER_COLORS = [
@@ -42,7 +43,6 @@ const MOCK_PLAYERS: Player[] = [
 
 export default function LobbyContent() {
   const searchParams = useSearchParams();
-  const roomCode = searchParams.get("roomCode") ?? "ABC123";
   const [settings, setSettings] = useState<LobbySettings>({
     rounds: 3,
     drawTime: 80,
@@ -62,7 +62,6 @@ export default function LobbyContent() {
           }),
           [myName],
     );
-  
   const players = useMemo(() => [me, ...MOCK_PLAYERS], [me]);
 
   return (
@@ -96,7 +95,6 @@ export default function LobbyContent() {
 
         <div className="order-1 lg:order-2 lg:min-h-[calc(100vh-5.5rem)]">
           <LobbySettingsPanel
-            // roomCode={roomCode}
             settings={settings}
             isHost={me.isHost}
             players={players}

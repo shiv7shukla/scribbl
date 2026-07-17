@@ -22,15 +22,23 @@ export type LobbySettings = {
   hints: number;
 };
 
-export type gameState = {
+export type sharedGameState = {
   roomCode: string;
-  messages: {sender: string, message: string}[];
+  messages: { sender: string, message: string }[];
   totalRounds: number;
   currentRound: number;
   maxPlayers: number;
-  players: {username: string, color: string}[];
+  players: { username: string, color: string, score: number, socketID: string, isAdmin: boolean, hasCorrectlyGuessed: boolean, isDrawer: boolean }[];
   gamePhase: string;
   drawTime: number;
+};
+
+export type privatePayload = {
+  guessWord: string;
+};
+
+export type identityPayload = {
+  playerID: string;
 };
 
 export type gameActions = {
@@ -41,7 +49,7 @@ export type gameActions = {
   setRoomCode: (roomCode: string) => void;
   setTotalRounds: (totalRounds: number) => void;
   setMaxPlayers: (maxPlayers: number) => void;
-  newPlayers: (newPlayer: {username: string, color: string} []) => void;
+  newPlayers: (newPlayer: { username: string, color: string, score: number, socketID: string, isAdmin: boolean, hasCorrectlyGuessed: boolean, isDrawer: boolean } []) => void;
 };
 
-export type gameStore = gameState & {actions: gameActions};
+export type gameStore = sharedGameState & privatePayload & identityPayload & {actions: gameActions};

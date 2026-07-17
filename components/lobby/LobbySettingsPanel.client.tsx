@@ -7,13 +7,11 @@ import { useGameStore } from '@/app/providers/game-store-provider';
 import { useShallow } from 'zustand/shallow';
 
 const LobbySettingsPanel = ({
-  // roomCode,
   settings,
   isHost,
   // players,
   onSettingsChange,
 }: {
-  // roomCode: string;
   settings: LobbySettings;
   isHost: boolean;
   players: Player[];
@@ -73,9 +71,9 @@ const LobbySettingsPanel = ({
           <button
             type="button"
             onClick={copyRoomCode}
-            className="pop-btn pop-press inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-bold"
+            className="pop-btn pop-press inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-bold hover: cursor-pointer"
           >
-            <Copy className="size-3.5" />
+            <Copy className="size-3.5 " />
             Copy
           </button>
         </div>
