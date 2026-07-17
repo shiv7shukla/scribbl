@@ -38,9 +38,10 @@ export type gameActions = {
   incrementRound: () => void;
   changeGamePhase: () => void;
   setDrawTime: (time: number) => void;
+  setRoomCode: (roomCode: string) => void;
   setTotalRounds: (totalRounds: number) => void;
   setMaxPlayers: (maxPlayers: number) => void;
   newPlayers: (newPlayer: {username: string, color: string} []) => void;
 };
 
-export type gameStore = gameState & gameActions;
+export type gameStore = gameState & {actions: gameActions};

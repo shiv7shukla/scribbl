@@ -7,13 +7,13 @@ import { useGameStore } from '@/app/providers/game-store-provider';
 import { useShallow } from 'zustand/shallow';
 
 const LobbySettingsPanel = ({
-  roomCode,
+  // roomCode,
   settings,
   isHost,
   // players,
   onSettingsChange,
 }: {
-  roomCode: string;
+  // roomCode: string;
   settings: LobbySettings;
   isHost: boolean;
   players: Player[];
@@ -41,20 +41,20 @@ const LobbySettingsPanel = ({
     totalRounds, 
     maxPlayers, 
     players,
-    drawTime, 
-    setDrawTime, 
-    setTotalRounds, 
-    setMaxPlayers 
-  } = useGameStore(useShallow((state) => ({ 
-    totalRounds: state.totalRounds,
-    maxPlayers: state.maxPlayers,
+    drawTime,
+    roomCode, 
+  } = useGameStore(useShallow((state) => ({
+    totalRounds: state.totalRounds, 
+    maxPlayers: state.maxPlayers, 
     players: state.players,
     drawTime: state.drawTime,
-    setDrawTime: state.setDrawTime,
-    setTotalRounds: state.setTotalRounds,
-    setMaxPlayers: state.setMaxPlayers,
-   })));
-
+    roomCode: state.roomCode, 
+  })));
+  const {
+    setDrawTime, 
+    setTotalRounds, 
+    setMaxPlayers
+  } = useGameStore((state) => ( state.actions ));
   const gameStart = () => {
     
   }

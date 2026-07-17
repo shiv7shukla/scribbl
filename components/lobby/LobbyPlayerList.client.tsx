@@ -1,8 +1,9 @@
 "use client";
 
+import { useGameStore } from '@/app/providers/game-store-provider';
 import { Player } from '@/lib/types/types';
 import { Users, Crown } from 'lucide-react';
-import React, { useMemo } from 'react'
+import { useShallow } from 'zustand/shallow';
 
 const PLAYER_COLORS = [
         "#e74c3c",
@@ -20,15 +21,30 @@ const PLAYER_COLORS = [
     ];
 
 const LobbyPlayerList = ({
-  players,
-  maxPlayers,
+//   players,
+//   maxPlayers,
   meId,
 }: {
   players: Player[];
   maxPlayers: number;
   meId: string;
 }) => {
-    
+    const { 
+        totalRounds, 
+        maxPlayers, 
+        players,
+        drawTime, 
+      } = useGameStore(useShallow((state) => ({ 
+        totalRounds: state.totalRounds,
+        maxPlayers: state.maxPlayers,
+        players: state.players,
+        drawTime: state.drawTime,
+       })));
+    const {
+        setDrawTime, 
+        setTotalRounds, 
+        setMaxPlayers 
+    } = useGameStore((state) => state.actions);
     const emptySlots = Math.max(0, maxPlayers - players.length);
     
     return (
@@ -44,32 +60,33 @@ const LobbyPlayerList = ({
         <ul className="flex flex-1 flex-col gap-2 overflow-y-auto">
             {players.map((player, index) => (
             <li
-                key={player.id}
-                className={`flex items-center gap-3 rounded-xl border-2 px-3 py-2.5 ${
-                player.id === meId
-                    ? "border-foreground bg-muted/50"
-                    : "border-border/50 bg-background/50"
-                }`}
+                // key={player.id}
+                // className={`flex items-center gap-3 rounded-xl border-2 px-3 py-2.5 ${
+                // player.id === meId
+                    // ? "border-foreground bg-muted/50"
+                    // : "border-border/50 bg-background/50"
+                // }`
+            // }
             >
                 <div
                     className="flex size-9 shrink-0 items-center justify-center rounded-full border-2 border-foreground text-sm font-bold text-white shadow-[2px_2px_0_0_var(--foreground)]"
                     style={{ backgroundColor: player.color }}
                     aria-hidden
                 >
-                    {player.name.charAt(0).toUpperCase()}
+                    {player.username.charAt(0).toUpperCase()}
                 </div>
                 <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
-                        <span className="truncate font-bold">{player.name}</span>
-                            {player.isHost && (
+                        <span className="truncate font-bold">{player.username}</span>
+                            {/* {player.isHost && (
                             <Crown className="size-4 shrink-0 text-amber-500" aria-label="Host" />
                             )}
                         {player.id === meId && (
                         <span className="text-xs font-bold text-muted-foreground">(you)</span>
-                    )}
+                    )} */}
                     </div>
                 </div>
-                <span className="font-display text-lg tabular-nums">{player.score}</span>
+                {/* <span className="font-display text-lg tabular-nums">{player.score}</span> */}
             </li>
             ))}
 

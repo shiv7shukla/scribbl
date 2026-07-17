@@ -15,12 +15,15 @@ export const defaultInitState: gameState = {
 export const createGameStore = ( initState: gameState = defaultInitState ) => {
     return createStore<gameStore>()((set) => ({
         ...initState,
-        changeGamePhase: () => set((state) => ({ gamePhase: "gaming" })),
-        setDrawTime: (drawTime) => set((state) => ({ drawTime: drawTime})),
-        setMaxPlayers: (maxPlayers) => set((state) => ({ maxPlayers: maxPlayers })),
-        setTotalRounds: (totalRounds) => set((state) => ({ totalRounds: totalRounds })),
-        incrementRound: () => set((state) => ({ currentRound: state.currentRound + 1 })),
-        newMessage: (newMsg) => set((state) => ({ messages: [...state.messages, ...newMsg] })),
-        newPlayers: (newPlayer) => set((state) => ({ players: [...state.players, ...newPlayer]})),
+        actions: {
+            changeGamePhase: () => set((state) => ({ gamePhase: "gaming" })),
+            setDrawTime: (drawTime) => set((state) => ({ drawTime: drawTime})),
+            setMaxPlayers: (maxPlayers) => set((state) => ({ maxPlayers: maxPlayers })),
+            setTotalRounds: (totalRounds) => set((state) => ({ totalRounds: totalRounds })),
+            setRoomCode: (roomCode) => set((state) => ({ roomCode: roomCode })),
+            incrementRound: () => set((state) => ({ currentRound: state.currentRound + 1 })),
+            newMessage: (newMsg) => set((state) => ({ messages: [...state.messages, ...newMsg] })),
+            newPlayers: (newPlayer) => set((state) => ({ players: [...state.players, ...newPlayer]})),
+        }
     }))
 }

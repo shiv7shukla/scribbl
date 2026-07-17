@@ -1,5 +1,6 @@
 "use client";
 
+import { useGameStore } from "@/app/providers/game-store-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -9,6 +10,7 @@ export default function HomePage() {
     const [name, setName] = useState("");
     const [joinCode, setJoinCode] = useState("");
     const router = useRouter();
+    const { setRoomCode } = useGameStore((state) => state);
 
     function ensureName(): string | null {
       const trimmed = name.trim().slice(0, 20);
@@ -24,6 +26,7 @@ export default function HomePage() {
       if (!trimmed) return;
 
       const code = String(crypto.randomUUID());
+      setRoomCode(code);
       router.push(`/room/${code}`);
     }
 
@@ -36,7 +39,7 @@ export default function HomePage() {
         toast.error("Enter a room code!");
         return;
       }
-
+      setRoomCode(code);
       router.push(`/room/${c}`);
     }
     

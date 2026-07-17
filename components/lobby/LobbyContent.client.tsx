@@ -96,7 +96,7 @@ export default function LobbyContent() {
 
         <div className="order-1 lg:order-2 lg:min-h-[calc(100vh-5.5rem)]">
           <LobbySettingsPanel
-            roomCode={roomCode}
+            // roomCode={roomCode}
             settings={settings}
             isHost={me.isHost}
             players={players}
