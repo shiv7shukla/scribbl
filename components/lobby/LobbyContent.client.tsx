@@ -2,23 +2,16 @@
 
 import { Toaster } from "@/components/ui/sonner";
 import {
-  Copy,
-  Crown,
-  Globe,
   Home,
-  Lock,
-  Send,
-  Users,
 } from "lucide-react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { useMemo, useState } from "react";
-import { toast } from "sonner";
+import { useState } from "react";
 import LobbyChatPanel from "./LobbyChatPanel.client";
-import { Player, ChatMessage, LobbySettings } from "@/lib/types/types";
+import { LobbySettings } from "@/lib/types/types";
 import LobbyPlayerList from "./LobbyPlayerList.client";
 import LobbySettingsPanel from "./LobbySettingsPanel.client";
 import { useGameStore } from "@/app/providers/game-store-provider";
+import { useShallow } from "zustand/shallow";
 
 
 const PLAYER_COLORS = [
@@ -36,13 +29,7 @@ const PLAYER_COLORS = [
         "#d35400",
         ];
 
-const MOCK_PLAYERS: Player[] = [
-  { id: "2", name: "SketchySam", color: PLAYER_COLORS[1], isHost: false, score: 0 },
-  { id: "3", name: "DoodleDan", color: PLAYER_COLORS[2], isHost: false, score: 0 },
-];
-
 export default function LobbyContent() {
-  const searchParams = useSearchParams();
   const [settings, setSettings] = useState<LobbySettings>({
     rounds: 3,
     drawTime: 80,
@@ -51,18 +38,21 @@ export default function LobbyContent() {
     useCustomWordsOnly: false,
     hints: 2,
   });
-  const myName = searchParams.get("name") ?? "Guest";
-      const me: Player = useMemo(
-          () => ({
-              id: "me",
-              name: myName,
-              color: PLAYER_COLORS[0],
-              isHost: true,
-              score: 0,
-          }),
-          [myName],
-    );
-  const players = useMemo(() => [me, ...MOCK_PLAYERS], [me]);
+  const {
+    totalRounds, 
+    maxPlayers, 
+    players,
+    currPlayer,
+    drawTime,
+    roomCode,
+    } = useGameStore(useShallow((state) => ({
+      totalRounds: state.totalRounds, 
+      maxPlayers: state.maxPlayers, 
+      players: state.players,
+      drawTime: state.drawTime,
+      roomCode: state.roomCode,
+      currPlayer: state.currPlayer
+    })));
 
   return (
     <div className="min-h-screen bg-background">
@@ -96,7 +86,7 @@ export default function LobbyContent() {
         <div className="order-1 lg:order-2 lg:min-h-[calc(100vh-5.5rem)]">
           <LobbySettingsPanel
             settings={settings}
-            isHost={me.isHost}
+            isHost={currPlayer.isAdmin}
             onSettingsChange={(patch) =>
               setSettings((prev) => ({ ...prev, ...patch }))
             }

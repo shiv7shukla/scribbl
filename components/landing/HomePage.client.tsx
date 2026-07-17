@@ -16,37 +16,40 @@ export default function HomePage() {
     const { currPlayer } = useGameStore(useShallow((state) => ({
         currPlayer: state.currPlayer
     })));
+    const { setCurrPlayer } = useGameStore((state) => state.actions);
 
     function ensureName(): string | null {
-      const trimmed = currPlayer.username.trim().slice(0, 20);
-      if (!trimmed) {
-          toast.error("Pick a nickname first!");
-          return null;
-      }
-      return trimmed;
+        const trimmed = currPlayer.username.trim().slice(0, 20);
+        if (!trimmed) {
+            toast.error("Pick a nickname first!");
+            return null;
+        }
+        return trimmed;
     }
 
     function createRoom() {
-      const trimmed = ensureName();
-      if (!trimmed) return;
+        const trimmed = ensureName();
+        if (!trimmed) return;
 
-      const code = String(crypto.randomUUID());
-      setRoomCode(code);
-      enterRoom(currPlayer);
-      router.push(`/room/${code}`);
+        const code = String(crypto.randomUUID());
+        setRoomCode(code);
+        setCurrPlayer({ isAdmin: true });
+        enterRoom(currPlayer, true);
+        router.push(`/room/${code}`);
     }
 
     function joinRoom(code: string) {
-      const trimmed = ensureName();
-      if (!trimmed) return;
+        const trimmed = ensureName();
+        if (!trimmed) return;
 
-      const c = code.trim();
-      if (!c) {
-        toast.error("Enter a room code!");
-        return;
-      }
-      setRoomCode(code);
-      router.push(`/room/${c}`);
+        const c = code.trim();
+        if (!c) {
+            toast.error("Enter a room code!");
+            return;
+        }
+        setRoomCode(code);
+        enterRoom(currPlayer, false);
+        router.push(`/room/${c}`);
     }
 
     useSocketListeners();
@@ -101,7 +104,6 @@ export default function HomePage() {
                             value={joinCode}
                             onChange={(e) => setJoinCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
                             placeholder="123456"
-                            maxLength={6}
                             className="flex-1 rounded-xl border-[3px] border-border bg-input px-4 py-3 text-lg font-bold tracking-widest focus:outline-none focus:ring-4 focus:ring-primary/30"
                         />
                         <button

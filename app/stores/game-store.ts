@@ -34,7 +34,7 @@ export const createGameStore = ( initState: sharedGameState & privatePayload & i
             setRoomCode: (roomCode) => set((state) => ({ roomCode: roomCode })),
             newPlayers: (newPlayers) => set((state) => ({ players: newPlayers })),
             setMaxPlayers: (maxPlayers) => set((state) => ({ maxPlayers: maxPlayers })),
-            enterRoom: (payload) => { socket.emit("join-room", get().roomCode, payload) },
+            enterRoom: (payload, admin) => { if(admin) {socket.emit("join-room", get().roomCode, payload);} else{socket.emit("join-created-room", get().roomCode, payload);} },
             setTotalRounds: (totalRounds) => set((state) => ({ totalRounds: totalRounds })),
             incrementRound: () => set((state) => ({ currentRound: state.currentRound + 1 })),
             newMessage: (newMsg) => set((state) => ({ messages: [...state.messages, ...newMsg] })),
