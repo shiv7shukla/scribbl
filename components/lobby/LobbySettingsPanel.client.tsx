@@ -9,12 +9,10 @@ import { useShallow } from 'zustand/shallow';
 const LobbySettingsPanel = ({
   settings,
   isHost,
-  // players,
   onSettingsChange,
 }: {
   settings: LobbySettings;
   isHost: boolean;
-  players: Player[];
   onSettingsChange: (patch: Partial<LobbySettings>) => void;
 }) => {
   const customWordCount = useMemo(
@@ -39,22 +37,25 @@ const LobbySettingsPanel = ({
     totalRounds, 
     maxPlayers, 
     players,
+    currPlayer,
     drawTime,
-    roomCode, 
+    roomCode,
   } = useGameStore(useShallow((state) => ({
     totalRounds: state.totalRounds, 
     maxPlayers: state.maxPlayers, 
     players: state.players,
     drawTime: state.drawTime,
-    roomCode: state.roomCode, 
+    roomCode: state.roomCode,
+    currPlayer: state.currPlayer
   })));
   const {
     setDrawTime, 
     setTotalRounds, 
-    setMaxPlayers
+    setMaxPlayers,
+    enterRoom
   } = useGameStore((state) => ( state.actions ));
   const gameStart = () => {
-    
+    // joinRoom(currPlayer);
   }
 
   return (
@@ -148,7 +149,7 @@ const LobbySettingsPanel = ({
               type="button"
               disabled={players.length < 2}
               onClick={gameStart}
-              className="pop-btn-primary pop-press px-8 py-4 font-display text-2xl disabled:opacity-50"
+              className={`pop-btn-primary pop-press px-8 py-4 font-display text-2xl disabled:opacity-50 ${players.find(p => p.isAdmin === true)? "visible" : "hidden"}`}
             >
               ▶ Start Game
             </button>

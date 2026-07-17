@@ -3,13 +3,12 @@
 import { DrawingEngine } from "@/lib/drawingcanvas/DrawingEngine";
 import { useEffect, useRef } from "react";
 import ToolBar from "./ToolBar";
-import { useSocket } from "@/lib/context/SocketContext";
+import { socket } from "@/app/socket";
 
 export default function Canvas() {
     const engineRef = useRef<DrawingEngine>(null);
     const divRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const {socket, isConnected} = useSocket();
 
     useEffect(() => {
         const canvas = canvasRef.current;

@@ -97,7 +97,6 @@ export default function LobbyContent() {
           <LobbySettingsPanel
             settings={settings}
             isHost={me.isHost}
-            players={players}
             onSettingsChange={(patch) =>
               setSettings((prev) => ({ ...prev, ...patch }))
             }

@@ -34,10 +34,12 @@ const LobbyPlayerList = ({
         maxPlayers, 
         players,
         drawTime, 
+        currPlayer
       } = useGameStore(useShallow((state) => ({ 
         totalRounds: state.totalRounds,
         maxPlayers: state.maxPlayers,
         players: state.players,
+        currPlayer: state.currPlayer,
         drawTime: state.drawTime,
        })));
     const {
@@ -60,13 +62,13 @@ const LobbyPlayerList = ({
         <ul className="flex flex-1 flex-col gap-2 overflow-y-auto">
             {players.map((player, index) => (
             <li
-                // key={player.id}
-                // className={`flex items-center gap-3 rounded-xl border-2 px-3 py-2.5 ${
-                // player.id === meId
-                    // ? "border-foreground bg-muted/50"
-                    // : "border-border/50 bg-background/50"
-                // }`
-            // }
+                key={player.username}
+                className={`flex items-center gap-3 rounded-xl border-2 px-3 py-2.5 ${
+                player.username === currPlayer.username
+                    ? "border-foreground bg-muted/50"
+                    : "border-border/50 bg-background/50"
+                }`
+            }
             >
                 <div
                     className="flex size-9 shrink-0 items-center justify-center rounded-full border-2 border-foreground text-sm font-bold text-white shadow-[2px_2px_0_0_var(--foreground)]"

@@ -1,6 +1,7 @@
 import next from "next";
 import { createServer } from "node:http";
-import { Server } from "socket.io";
+import { Server, type Socket } from "socket.io";
+import type { Player } from "./lib/types/types";
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = "localhost";
@@ -13,11 +14,27 @@ app.prepare().then(() => {
   const httpServer = createServer(handler);
 
   const io = new Server(httpServer, { transports: ["websocket"] });
+  const players: Player[] = [];
+
+  const initializePayload = ( payload: Player, socket: Socket, roomCode: string ) => {
+    payload.socketID = socket.id;
+    socket.join(roomCode);
+    players.push(payload);
+}
 
   io.on("connection", (socket) => {
-    socket.on("draw-event", (data) => {
-      console.log("received draw-outgoing", data);
-      socket.broadcast.emit("draw-incoming", data);
+    console.log("server connected");
+    socket.on("join-room", (roomCode, payload) => {
+      initializePayload(payload, socket, roomCode);
+      payload.isAdmin = true;
+      io.to(roomCode).emit("new-joinee", players);
+      socket.emit("permanent-ID", String(crypto.randomUUID()))
+    });
+
+    socket.on("join-created-room", (roomCode, payload) => {
+      initializePayload(payload, socket, roomCode);
+      io.to(roomCode).emit("new-joinee", players);
+      socket.emit("permanent-ID", String(crypto.randomUUID()))
     });
   });
 

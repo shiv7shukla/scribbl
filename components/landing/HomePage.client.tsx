@@ -2,18 +2,23 @@
 
 import { useGameStore } from "@/app/providers/game-store-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { useSocketListeners } from "@/lib/socket/socketEvents";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useShallow } from "zustand/shallow";
 
 export default function HomePage() {
     const [name, setName] = useState("");
     const [joinCode, setJoinCode] = useState("");
     const router = useRouter();
-    const { setRoomCode } = useGameStore((state) => state.actions);
+    const { setRoomCode, setUserName, enterRoom } = useGameStore((state) => state.actions);
+    const { currPlayer } = useGameStore(useShallow((state) => ({
+        currPlayer: state.currPlayer
+    })));
 
     function ensureName(): string | null {
-      const trimmed = name.trim().slice(0, 20);
+      const trimmed = currPlayer.username.trim().slice(0, 20);
       if (!trimmed) {
           toast.error("Pick a nickname first!");
           return null;
@@ -27,6 +32,7 @@ export default function HomePage() {
 
       const code = String(crypto.randomUUID());
       setRoomCode(code);
+      enterRoom(currPlayer);
       router.push(`/room/${code}`);
     }
 
@@ -42,6 +48,8 @@ export default function HomePage() {
       setRoomCode(code);
       router.push(`/room/${c}`);
     }
+
+    useSocketListeners();
     
   return (
     <div className="min-h-screen bg-background">
@@ -61,8 +69,8 @@ export default function HomePage() {
                         Your nickname
                     </label>
                     <input
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        value={currPlayer.username}
+                        onChange={(e) => setUserName(e.target.value)}
                         placeholder="Captain Doodle"
                         maxLength={20}
                         className="w-full rounded-xl border-[3px] border-border bg-input px-4 py-3 text-lg font-bold focus:outline-none focus:ring-4 focus:ring-primary/30"
