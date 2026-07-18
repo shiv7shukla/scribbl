@@ -102,7 +102,7 @@ export default function HomePage() {
                     <div className="flex gap-2">
                         <input
                             value={joinCode}
-                            onChange={(e) => setJoinCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                            onChange={(e) => setJoinCode(e.target.value)}
                             placeholder="123456"
                             className="flex-1 rounded-xl border-[3px] border-border bg-input px-4 py-3 text-lg font-bold tracking-widest focus:outline-none focus:ring-4 focus:ring-primary/30"
                         />

@@ -23,11 +23,10 @@ const PLAYER_COLORS = [
 const LobbyPlayerList = ({
 //   players,
 //   maxPlayers,
-  meId,
 }: {
   players: Player[];
   maxPlayers: number;
-  meId: string;
+//   meId: string;
 }) => {
     const { 
         totalRounds, 
@@ -80,12 +79,12 @@ const LobbyPlayerList = ({
                 <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
                         <span className="truncate font-bold">{player.username}</span>
-                            {/* {player.isHost && (
-                            <Crown className="size-4 shrink-0 text-amber-500" aria-label="Host" />
+                            {player.isAdmin && (
+                                <Crown className="size-4 shrink-0 text-amber-500" aria-label="Host" />
                             )}
-                        {player.id === meId && (
-                        <span className="text-xs font-bold text-muted-foreground">(you)</span>
-                    )} */}
+                        {player.socketID === currPlayer.socketID && (
+                            <span className="text-xs font-bold text-muted-foreground">(you)</span>
+                    )}
                     </div>
                 </div>
                 {/* <span className="font-display text-lg tabular-nums">{player.score}</span> */}
