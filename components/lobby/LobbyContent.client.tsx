@@ -31,7 +31,7 @@ const PLAYER_COLORS = [
 
 export default function LobbyContent() {
   const [settings, setSettings] = useState<LobbySettings>({
-    rounds: 3,
+    totalRounds: 3,
     drawTime: 80,
     maxPlayers: 8,
     customWords: "",
@@ -72,7 +72,7 @@ export default function LobbyContent() {
           </div>
           <div className="w-[88px]" aria-hidden />
         </div>
-      </header>
+      </header> 
 
       <main className="mx-auto grid max-w-[1600px] gap-4 p-4 lg:grid-cols-[minmax(220px,280px)_1fr_minmax(240px,320px)] lg:items-start lg:gap-5 lg:p-5">
         <div className="order-2 lg:order-1 lg:min-h-[calc(100vh-5.5rem)]">
@@ -87,7 +87,7 @@ export default function LobbyContent() {
             settings={settings}
             isHost={currPlayer.isAdmin}
             onSettingsChange={(patch) =>
-              setSettings((prev) => ({ ...prev, ...patch }))
+            setSettings((prev) => ({ ...prev, ...patch }))
             }
           />
         </div>

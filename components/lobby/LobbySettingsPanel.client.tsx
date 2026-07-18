@@ -86,7 +86,7 @@ const LobbySettingsPanel = ({
           value={totalRounds}
           options={[2, 3, 4, 5, 6, 8]}
           disabled={!isHost}
-          onChange={(rounds) => setTotalRounds( rounds )}
+          onChange={(totalRounds) => setTotalRounds( totalRounds )}
         />
         <LobbySettingsControl
           label="Draw time (s)"

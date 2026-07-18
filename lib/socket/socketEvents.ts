@@ -9,7 +9,7 @@ export const useSocketListeners = () => {
         players: state.players,
         currPlayer: state.currPlayer
     })));
-    const { newPlayers, setCurrPlayer } = useGameStore((state) => state.actions);
+    const { newPlayers, setCurrPlayer, applyRemoteSettings } = useGameStore((state) => state.actions);
 
     useEffect(() => {
         socket.connect();
@@ -19,6 +19,20 @@ export const useSocketListeners = () => {
         });
         socket.on("permanent-ID", (ID: string) => {
             sessionStorage.setItem("PlayerID", ID);
+        });
+        socket.on("lobby-settings", (payload) => {
+            switch(payload.settingsName){
+                case "drawTime":
+                    applyRemoteSettings(payload.settingsName, payload.settingsVal);
+                break;
+                case "maxPlayers":
+                    applyRemoteSettings(payload.settingsName, payload.settingsVal);
+                    console.log("received", payload.settingsVal);
+                break;
+                case "totalRounds":
+                    applyRemoteSettings(payload.settingsName, payload.settingsVal);
+                break;
+            }
         })
     }, []);
 }

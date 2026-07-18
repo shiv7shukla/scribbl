@@ -29,17 +29,43 @@ export const createGameStore = ( initState: sharedGameState & privatePayload & i
     return createStore<gameStore>()((set, get) => ({
         ...initState,
         actions: {
+            applyRemoteSettings: (settingsName, settingsVal) => set((state) => ({ [settingsName]: settingsVal })),
             changeGamePhase: () => set((state) => ({ gamePhase: "gaming" })),
-            setDrawTime: (drawTime) => set((state) => ({ drawTime: drawTime})),
             setRoomCode: (roomCode) => set((state) => ({ roomCode: roomCode })),
             newPlayers: (newPlayers) => set((state) => ({ players: newPlayers })),
-            setMaxPlayers: (maxPlayers) => set((state) => ({ maxPlayers: maxPlayers })),
-            enterRoom: (payload, admin) => { if(admin) {socket.emit("join-room", get().roomCode, payload);} else{socket.emit("join-created-room", get().roomCode, payload);} },
-            setTotalRounds: (totalRounds) => set((state) => ({ totalRounds: totalRounds })),
             incrementRound: () => set((state) => ({ currentRound: state.currentRound + 1 })),
             newMessage: (newMsg) => set((state) => ({ messages: [...state.messages, ...newMsg] })),
             setUserName: (username) => set((state) => ({ currPlayer: { ...state.currPlayer, username }})),
             setCurrPlayer: (updatedFields) => set((state) => ({ currPlayer: state.currPlayer? { ...state.currPlayer, ...updatedFields } : state.currPlayer })),
+
+            setMaxPlayers: (maxPlayers) => { 
+                set((state) => ({ maxPlayers: maxPlayers })); 
+                socket.emit("settings", {roomCode: get().roomCode, settingsName: "maxPlayers", settingsVal: maxPlayers});
+                console.log("sent");
+
+            },
+
+            setDrawTime: (drawTime) => {
+                set((state) => ({ drawTime: drawTime}));
+                socket.emit("settings", {roomCode: get().roomCode, settingsName: "drawTime", settingsVal: drawTime});
+            },
+
+            setTotalRounds: (totalRounds) => {
+                set((state) => ({ totalRounds: totalRounds }))
+                socket.emit("settings", {roomCode: get().roomCode, settingsName: "totalRounds", settingsVal: totalRounds});
+            },
+
+            enterRoom: (payload, admin) => { 
+                if(admin) 
+                    socket.emit("join-room", get().roomCode, payload);
+                else
+                    socket.emit("join-created-room", get().roomCode, payload);
+            },
+
+            sendLobbySettings: (settingsName, settingsVal) => {
+                socket.emit("settings", {settingsName, settingsVal});
+            },
+
         }
     }))
 }

@@ -15,6 +15,7 @@ app.prepare().then(() => {
 
   const io = new Server(httpServer, { transports: ["websocket"] });
   const players: Player[] = [];
+  const roomCode: String = "";
 
   const initializePayload = ( payload: Player, socket: Socket, roomCode: string ) => {
     payload.socketID = socket.id;
@@ -36,6 +37,11 @@ app.prepare().then(() => {
       io.to(roomCode).emit("new-joinee", players);
       socket.emit("permanent-ID", String(crypto.randomUUID()))
     });
+
+    socket.on("settings", (payload) => {
+      socket.to(payload.roomCode).emit("lobby-settings", payload);
+      console.log("socket sent");
+    })
   });
 
   httpServer

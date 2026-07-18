@@ -6,7 +6,7 @@ export type ChatMessage = {
 };
 
 export type LobbySettings = {
-	rounds: number;
+	totalRounds: number;
 	drawTime: number;
 	maxPlayers: number;
 	customWords: string;
@@ -45,6 +45,7 @@ export type identityPayload = {
 };
 
 export type gameActions = {
+	applyRemoteSettings: (settingsName: string, settingsVal: string | number | boolean) => void;
 	newMessage: (newMsg: {sender: string, message: string} []) => void;
 	incrementRound: () => void;
 	changeGamePhase: () => void;
@@ -56,6 +57,7 @@ export type gameActions = {
 	setMaxPlayers: (maxPlayers: number) => void;
 	newPlayers: (newPlayers: Player []) => void;
 	setCurrPlayer: (updatedFields: Partial<Player>) => void;
+	sendLobbySettings: (settingsName: Partial<LobbySettings>, settingsVal: string | number | boolean) => void;
 };
 
 export type gameStore = sharedGameState & privatePayload & identityPayload & {actions: gameActions};
