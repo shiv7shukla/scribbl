@@ -40,9 +40,6 @@ export type privatePayload = {
   	guessWord: string;
 };
 
-export type identityPayload = {
-  	playerID: string;
-};
 
 export type gameActions = {
 	applyRemoteSettings: (settingsName: string, settingsVal: string | number | boolean) => void;
@@ -60,4 +57,4 @@ export type gameActions = {
 	sendLobbySettings: (settingsName: Partial<LobbySettings>, settingsVal: string | number | boolean) => void;
 };
 
-export type gameStore = sharedGameState & privatePayload & identityPayload & {actions: gameActions};
+export type gameStore = sharedGameState & privatePayload & {actions: gameActions};

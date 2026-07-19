@@ -17,22 +17,8 @@ export const useSocketListeners = () => {
             setCurrPlayer({ socketID: socket.id })
             newPlayers(payload);
         });
-        socket.on("permanent-ID", (ID: string) => {
-            sessionStorage.setItem("PlayerID", ID);
-        });
         socket.on("lobby-settings", (payload) => {
-            switch(payload.settingsName){
-                case "drawTime":
-                    applyRemoteSettings(payload.settingsName, payload.settingsVal);
-                break;
-                case "maxPlayers":
-                    applyRemoteSettings(payload.settingsName, payload.settingsVal);
-                    console.log("received", payload.settingsVal);
-                break;
-                case "totalRounds":
-                    applyRemoteSettings(payload.settingsName, payload.settingsVal);
-                break;
-            }
+            applyRemoteSettings(payload.settingsName, payload.settingsVal);
         })
     }, []);
 }

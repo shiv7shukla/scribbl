@@ -1,8 +1,8 @@
-import { gameStore, identityPayload, privatePayload, sharedGameState } from "@/lib/types/types";
+import { gameStore, privatePayload, sharedGameState } from "@/lib/types/types";
 import { createStore } from "zustand";
 import { socket } from "../socket";
 
-export const defaultInitState: sharedGameState & privatePayload & identityPayload = {
+export const defaultInitState: sharedGameState & privatePayload = {
     roomCode: "",
     messages: [],
     totalRounds: 3,
@@ -12,7 +12,6 @@ export const defaultInitState: sharedGameState & privatePayload & identityPayloa
     gamePhase: "lobby",
     drawTime: 80,
     guessWord: "",
-    playerID: "",
     currPlayer: {
         username: "",
         color: "#000000",
@@ -25,7 +24,7 @@ export const defaultInitState: sharedGameState & privatePayload & identityPayloa
 }
 
 
-export const createGameStore = ( initState: sharedGameState & privatePayload & identityPayload = defaultInitState ) => {
+export const createGameStore = ( initState: sharedGameState & privatePayload = defaultInitState ) => {
     return createStore<gameStore>()((set, get) => ({
         ...initState,
         actions: {

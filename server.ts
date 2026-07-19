@@ -24,24 +24,20 @@ app.prepare().then(() => {
 }
 
   io.on("connection", (socket) => {
-    console.log("server connected");
     socket.on("join-room", (roomCode, payload) => {
       initializePayload(payload, socket, roomCode);
       payload.isAdmin = true;
       io.to(roomCode).emit("new-joinee", players);
-      socket.emit("permanent-ID", String(crypto.randomUUID()))
     });
 
     socket.on("join-created-room", (roomCode, payload) => {
       initializePayload(payload, socket, roomCode);
       io.to(roomCode).emit("new-joinee", players);
-      socket.emit("permanent-ID", String(crypto.randomUUID()))
     });
 
     socket.on("settings", (payload) => {
       socket.to(payload.roomCode).emit("lobby-settings", payload);
-      console.log("socket sent");
-    })
+    });
   });
 
   httpServer
