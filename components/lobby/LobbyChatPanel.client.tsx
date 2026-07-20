@@ -1,40 +1,34 @@
 "use client";
 
+import { useGameStore } from '@/app/providers/game-store-provider';
 import { ChatMessage, Player } from '@/lib/types/types';
 import { Send } from 'lucide-react';
 import React, { useState } from 'react'
 
 const LobbyChatPanel = ({ players }: { players: Player[] }) => {
-    const [messages, setMessages] = useState<ChatMessage[]>();
+    const [draft, setDraft] = useState("");
+    const { messages, currPlayer } = useGameStore((state) => state);
+    const { newMessage } = useGameStore((state) => state.actions);
 
     function sendMessage() {
         const text = draft.trim();
         if (!text) return;
 
-        // setMessages((prev) => [
-        // ...prev,
-        // {
-        //     id: crypto.randomUUID(),
-        //     author: "You",
-        //     color: players[0]?.color ?? PLAYER_COLORS[0],
-        //     text,
-        // },
-        // ]);
+        newMessage({id:String(crypto.randomUUID()), sender: currPlayer.username, message: text});
         setDraft("");
   }
-    const [draft, setDraft] = useState("");
   return (
     <aside className="pop-card-lg flex h-full flex-col bg-paper p-4">
       <h2 className="mb-3 border-b-2 border-border/60 pb-3 font-display text-lg">Chat</h2>
       <ul className="flex flex-1 flex-col gap-2 overflow-y-auto pr-1">
-        {/* {messages.map((msg) => (
+        {messages.map((msg) => (
           <li key={msg.id} className="text-sm leading-snug">
-            <span className="font-bold" style={{ color: msg.color }}>
-              {msg.author}:
-            </span>{" "}
-            <span>{msg.text}</span>
+            {/* <span className="font-bold" style={{ color: msg.color }}> */}
+              {msg.sender}:
+            {/* </span>{" "} */}
+            <span>{msg.message}</span>
           </li>
-        ))} */}
+        ))}
       </ul>
       <form
         className="mt-3 flex gap-2"

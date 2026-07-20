@@ -2,14 +2,12 @@
 
 import { useGameStore } from "@/app/providers/game-store-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { useSocketListeners } from "@/lib/socket/socketEvents";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
 
 export default function HomePage() {
-    const [name, setName] = useState("");
     const [joinCode, setJoinCode] = useState("");
     const router = useRouter();
     const { setRoomCode, setUserName, enterRoom } = useGameStore((state) => state.actions);
@@ -52,8 +50,6 @@ export default function HomePage() {
         router.push(`/room/${c}`);
     }
 
-    useSocketListeners();
-    
   return (
     <div className="min-h-screen bg-background">
       <Toaster position="top-center" />

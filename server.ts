@@ -10,6 +10,8 @@ const port = 3000;
 const app = next({ dev, hostname, port });
 const handler = app.getRequestHandler();
 
+const rooms: Record<string, Player[]> = {};
+
 app.prepare().then(() => {
   const httpServer = createServer(handler);
 
@@ -19,20 +21,36 @@ app.prepare().then(() => {
 
   const initializePayload = ( payload: Player, socket: Socket, roomCode: string ) => {
     payload.socketID = socket.id;
+    payload.id = crypto.randomUUID();
     socket.join(roomCode);
     players.push(payload);
-}
+  }
+
+  // const initializePayload = (payload: Player, socket: Socket, roomCode: string) => {
+  //   payload.id = crypto.randomUUID();
+  //   console.log("JOIN ATTEMPT:", { socketId: socket.id, roomCode, playerId: payload.id });
+  //   payload.socketID = socket.id;
+  //   socket.join(roomCode);
+  //   if (!rooms[roomCode]) rooms[roomCode] = [];
+  //   rooms[roomCode].push(payload);
+  //   players.push(payload);
+  //   console.log("PLAYERS AFTER PUSH:", players.map(p => ({ id: p.id, socketID: p.socketID })));
+  // };
 
   io.on("connection", (socket) => {
     socket.on("join-room", (roomCode, payload) => {
-      initializePayload(payload, socket, roomCode);
       payload.isAdmin = true;
-      io.to(roomCode).emit("new-joinee", players);
+      initializePayload(payload, socket, roomCode);
+      console.log("EMITTING to room:", roomCode, "sockets in room:", io.sockets.adapter.rooms.get(roomCode)?.size);
+      io.to(roomCode).emit("new-joinee", players, payload);
+      // io.to(roomCode).emit("new-joinee", rooms[roomCode], payload);
     });
 
     socket.on("join-created-room", (roomCode, payload) => {
       initializePayload(payload, socket, roomCode);
-      io.to(roomCode).emit("new-joinee", players);
+      console.log("EMITTING to room:", roomCode, "sockets in room:", io.sockets.adapter.rooms.get(roomCode)?.size);
+      io.to(roomCode).emit("new-joinee", players, payload);
+      // io.to(roomCode).emit("new-joinee", rooms[roomCode], payload);
     });
 
     socket.on("settings", (payload) => {

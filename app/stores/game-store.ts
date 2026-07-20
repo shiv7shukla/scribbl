@@ -13,6 +13,7 @@ export const defaultInitState: sharedGameState & privatePayload = {
     drawTime: 80,
     guessWord: "",
     currPlayer: {
+        id: "",
         username: "",
         color: "#000000",
         score: 0,
@@ -28,12 +29,14 @@ export const createGameStore = ( initState: sharedGameState & privatePayload = d
     return createStore<gameStore>()((set, get) => ({
         ...initState,
         actions: {
-            applyRemoteSettings: (settingsName, settingsVal) => set((state) => ({ [settingsName]: settingsVal })),
             changeGamePhase: () => set((state) => ({ gamePhase: "gaming" })),
+            incrementRound: () => set((state) => ({ currentRound: state.currentRound + 1 })),
+            
             setRoomCode: (roomCode) => set((state) => ({ roomCode: roomCode })),
             newPlayers: (newPlayers) => set((state) => ({ players: newPlayers })),
-            incrementRound: () => set((state) => ({ currentRound: state.currentRound + 1 })),
-            newMessage: (newMsg) => set((state) => ({ messages: [...state.messages, ...newMsg] })),
+            applyRemoteSettings: (settingsName, settingsVal) => set((state) => ({ [settingsName]: settingsVal })),
+
+            newMessage: (newMsg) => set((state) => ({ messages: [...state.messages, newMsg] })),
             setUserName: (username) => set((state) => ({ currPlayer: { ...state.currPlayer, username }})),
             setCurrPlayer: (updatedFields) => set((state) => ({ currPlayer: state.currPlayer? { ...state.currPlayer, ...updatedFields } : state.currPlayer })),
 

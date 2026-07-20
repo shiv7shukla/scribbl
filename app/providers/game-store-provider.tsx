@@ -4,6 +4,7 @@ import { type ReactNode, createContext, useState, useContext } from 'react'
 import { useStore } from 'zustand'
 import { createGameStore } from '../stores/game-store';
 import { gameStore } from '@/lib/types/types';
+import { SocketListeners } from './socket-listeners.client';
 
 export type GameStoreApi = ReturnType<typeof createGameStore>
 
@@ -21,6 +22,7 @@ export const GameStoreProvider = ({
   const [store] = useState(() => createGameStore())
   return (
     <GameStoreContext.Provider value={store}>
+      <SocketListeners />
       {children}
     </GameStoreContext.Provider>
   )

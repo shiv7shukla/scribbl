@@ -61,7 +61,7 @@ const LobbyPlayerList = ({
         <ul className="flex flex-1 flex-col gap-2 overflow-y-auto">
             {players.map((player, index) => (
             <li
-                key={player.username}
+                key={player.id}
                 className={`flex items-center gap-3 rounded-xl border-2 px-3 py-2.5 ${
                 player.username === currPlayer.username
                     ? "border-foreground bg-muted/50"

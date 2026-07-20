@@ -15,6 +15,7 @@ export type LobbySettings = {
 };
 
 export type Player = { 
+	id: string,
 	username: string, 
 	color: string, 
 	score: number, 
@@ -26,7 +27,7 @@ export type Player = {
 
 export type sharedGameState = {
 	roomCode: string;
-	messages: { sender: string, message: string }[];
+	messages: { id: string, sender: string, message: string }[];
 	totalRounds: number;
 	currentRound: number;
 	maxPlayers: number;
@@ -43,7 +44,7 @@ export type privatePayload = {
 
 export type gameActions = {
 	applyRemoteSettings: (settingsName: string, settingsVal: string | number | boolean) => void;
-	newMessage: (newMsg: {sender: string, message: string} []) => void;
+	newMessage: (newMsg: {id: string, sender: string, message: string}) => void;
 	incrementRound: () => void;
 	changeGamePhase: () => void;
 	enterRoom: (payload: Player, admin: boolean) => void;
