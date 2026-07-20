@@ -17,9 +17,10 @@ app.prepare().then(() => {
 
   const io = new Server(httpServer, { transports: ["websocket"] });
   const players: Player[] = [];
-  const roomCode: String = "";
+  let roomCode: string;
 
-  const initializePayload = ( payload: Player, socket: Socket, roomCode: string ) => {
+  const initializePayload = ( payload: Player, socket: Socket, rc: string ) => {
+    roomCode = rc;
     payload.socketID = socket.id;
     payload.id = crypto.randomUUID();
     socket.join(roomCode);
@@ -56,6 +57,12 @@ app.prepare().then(() => {
     socket.on("settings", (payload) => {
       socket.to(payload.roomCode).emit("lobby-settings", payload);
     });
+
+    socket.on("new-message", (payload) => {
+      console.log(payload);
+      socket.to(roomCode).emit("message-received", payload);
+    })
+
   });
 
   httpServer

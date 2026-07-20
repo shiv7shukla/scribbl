@@ -24,7 +24,6 @@ export const defaultInitState: sharedGameState & privatePayload = {
     }
 }
 
-
 export const createGameStore = ( initState: sharedGameState & privatePayload = defaultInitState ) => {
     return createStore<gameStore>()((set, get) => ({
         ...initState,
@@ -68,6 +67,9 @@ export const createGameStore = ( initState: sharedGameState & privatePayload = d
                 socket.emit("settings", {settingsName, settingsVal});
             },
 
+            sendNewMessage: (payload: {id: string, sender: string, message: string}) => {
+                socket.emit("new-message", payload);
+            },
         }
     }))
 }

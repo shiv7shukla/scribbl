@@ -8,14 +8,15 @@ import React, { useState } from 'react'
 const LobbyChatPanel = ({ players }: { players: Player[] }) => {
     const [draft, setDraft] = useState("");
     const { messages, currPlayer } = useGameStore((state) => state);
-    const { newMessage } = useGameStore((state) => state.actions);
+    const { newMessage, sendNewMessage } = useGameStore((state) => state.actions);
 
     function sendMessage() {
-        const text = draft.trim();
-        if (!text) return;
-
-        newMessage({id:String(crypto.randomUUID()), sender: currPlayer.username, message: text});
-        setDraft("");
+      const text = draft.trim();
+      if (!text) return;
+      const id = crypto.randomUUID();
+      newMessage({id, sender: currPlayer.username, message: text});
+      sendNewMessage({id, sender: currPlayer.username, message: text});
+      setDraft("");
   }
   return (
     <aside className="pop-card-lg flex h-full flex-col bg-paper p-4">

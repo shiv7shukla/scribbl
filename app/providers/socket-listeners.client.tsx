@@ -27,13 +27,19 @@ export function SocketListeners() {
 
     const onLobbySettings = (payload: {
       settingsName: string;
-      settingsVal: unknown;
+      settingsVal: string | number | boolean;
     }) => {
       store.getState().actions.applyRemoteSettings(payload.settingsName, payload.settingsVal);
     };
 
+    const onMessageReceived = (payload: {id: string, sender: string, message: string}) => {
+      console.log(payload);
+      store.getState().actions.newMessage(payload);
+    }
+
     socket.on("new-joinee", onNewJoinee);
     socket.on("lobby-settings", onLobbySettings);
+    socket.on("message-received", onMessageReceived);
 
     return () => {
       socket.off("new-joinee", onNewJoinee);

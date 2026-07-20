@@ -56,6 +56,7 @@ export type gameActions = {
 	newPlayers: (newPlayers: Player []) => void;
 	setCurrPlayer: (updatedFields: Partial<Player>) => void;
 	sendLobbySettings: (settingsName: Partial<LobbySettings>, settingsVal: string | number | boolean) => void;
+	sendNewMessage: (payload: {id: string, sender: string, message: string}) => void;
 };
 
 export type gameStore = sharedGameState & privatePayload & {actions: gameActions};
