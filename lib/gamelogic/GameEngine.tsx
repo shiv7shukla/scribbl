@@ -3,7 +3,7 @@ import { Player } from "../types/types";
 
 export class GameEngine{
     public roomCode: string;
-    public allPlayers: Record<string, Player>;              
+    public allPlayers: Record<string, Player>; // socketId => Payer Object
     public turnOrder: string[];             
     public currentDrawer: string;           
     public adminId: string;                 

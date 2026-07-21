@@ -11,15 +11,12 @@ const port = 3000;
 const app = next({ dev, hostname, port });
 const handler = app.getRequestHandler();
 
-export const rooms: Record<string, GameEngine> = {};
+export const rooms: Record<string, GameEngine> = {}; // roomCode => class object
 
 app.prepare().then(() => {
   const httpServer = createServer(handler);
-
   const io = new Server(httpServer, { transports: ["websocket"] });
-  const players: Player[] = [];
-
-  function createRoom(roomCode: string, payload: Player) {
+  const createRoom = (roomCode: string, payload: Player) => {
     const obj = new GameEngine();
     rooms[roomCode] = obj;
     obj.roomCode = roomCode;
@@ -27,11 +24,11 @@ app.prepare().then(() => {
     obj.allPlayers[payload.socketID] = payload;
     obj.formQueue();
   }
-
   const initializePayload = (payload: Player, socket: Socket, roomCode: string) => {
+    socket.data.roomCode = roomCode;
+    socket.join(roomCode);
     payload.socketID = socket.id;
     payload.id = crypto.randomUUID();
-    socket.data.roomCode = roomCode;
   }
 
   io.on("connection", (socket) => {
@@ -39,12 +36,13 @@ app.prepare().then(() => {
       payload.isAdmin = true;
       initializePayload(payload, socket, roomCode);
       createRoom(roomCode, payload);
-      io.to(roomCode).emit("new-joinee", players, payload);
+      console.log(Object.values(rooms[socket.data.roomCode].allPlayers));
+      io.to(roomCode).emit("new-joinee", Object.values(rooms[socket.data.roomCode].allPlayers), payload);
     });
 
     socket.on("join-created-room", (roomCode, payload) => {
       initializePayload(payload, socket, roomCode);
-      io.to(roomCode).emit("new-joinee", players, payload);
+      io.to(roomCode).emit("new-joinee", Object.values(rooms[socket.data.roomCode].allPlayers), payload);
     });
 
     socket.on("settings", (payload) => {

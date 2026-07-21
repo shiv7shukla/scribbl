@@ -12,10 +12,13 @@ export function SocketListeners() {
     if (!store) return;
 
     socket.connect();
+    socket.on("connect", () => {
+      console.log("connected");
+    })
 
     const onNewJoinee = (players: Player[], payload: Player) => {
-      const { newPlayers, newMessage, setCurrPlayer } = store.getState().actions;
       console.log("CLIENT received new-joinee:", players, "from", payload.username);
+      const { newPlayers, newMessage, setCurrPlayer } = store.getState().actions;
       setCurrPlayer({ socketID: socket.id });
       newMessage({
         id: crypto.randomUUID(),
