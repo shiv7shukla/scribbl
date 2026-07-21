@@ -52,10 +52,11 @@ const LobbySettingsPanel = ({
     setDrawTime, 
     setTotalRounds, 
     setMaxPlayers,
-    enterRoom
+    enterRoom,
+    changeGamePhase
   } = useGameStore((state) => ( state.actions ));
   const gameStart = () => {
-    // joinRoom(currPlayer);
+    changeGamePhase();
   }
 
   return (
