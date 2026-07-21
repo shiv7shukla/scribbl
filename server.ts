@@ -2,6 +2,7 @@ import next from "next";
 import { createServer } from "node:http";
 import { Server, type Socket } from "socket.io";
 import type { Player } from "./lib/types/types";
+import { GameEngine } from "./lib/gamelogic/GameEngine";
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = "localhost";
@@ -10,48 +11,40 @@ const port = 3000;
 const app = next({ dev, hostname, port });
 const handler = app.getRequestHandler();
 
-const rooms: Record<string, Player[]> = {};
+export const rooms: Record<string, GameEngine> = {};
 
 app.prepare().then(() => {
   const httpServer = createServer(handler);
 
   const io = new Server(httpServer, { transports: ["websocket"] });
   const players: Player[] = [];
-  let roomCode: string;
 
-  const initializePayload = ( payload: Player, socket: Socket, rc: string ) => {
-    roomCode = rc;
-    payload.socketID = socket.id;
-    payload.id = crypto.randomUUID();
-    socket.join(roomCode);
-    players.push(payload);
+  function createRoom(roomCode: string, payload: Player) {
+    const obj = new GameEngine();
+    rooms[roomCode] = obj;
+    obj.roomCode = roomCode;
+    obj.adminId = payload.socketID;
+    obj.allPlayers[payload.socketID] = payload;
+    obj.formQueue();
   }
 
-  // const initializePayload = (payload: Player, socket: Socket, roomCode: string) => {
-  //   payload.id = crypto.randomUUID();
-  //   console.log("JOIN ATTEMPT:", { socketId: socket.id, roomCode, playerId: payload.id });
-  //   payload.socketID = socket.id;
-  //   socket.join(roomCode);
-  //   if (!rooms[roomCode]) rooms[roomCode] = [];
-  //   rooms[roomCode].push(payload);
-  //   players.push(payload);
-  //   console.log("PLAYERS AFTER PUSH:", players.map(p => ({ id: p.id, socketID: p.socketID })));
-  // };
+  const initializePayload = (payload: Player, socket: Socket, roomCode: string) => {
+    payload.socketID = socket.id;
+    payload.id = crypto.randomUUID();
+    socket.data.roomCode = roomCode;
+  }
 
   io.on("connection", (socket) => {
     socket.on("join-room", (roomCode, payload) => {
       payload.isAdmin = true;
       initializePayload(payload, socket, roomCode);
-      console.log("EMITTING to room:", roomCode, "sockets in room:", io.sockets.adapter.rooms.get(roomCode)?.size);
+      createRoom(roomCode, payload);
       io.to(roomCode).emit("new-joinee", players, payload);
-      // io.to(roomCode).emit("new-joinee", rooms[roomCode], payload);
     });
 
     socket.on("join-created-room", (roomCode, payload) => {
       initializePayload(payload, socket, roomCode);
-      console.log("EMITTING to room:", roomCode, "sockets in room:", io.sockets.adapter.rooms.get(roomCode)?.size);
       io.to(roomCode).emit("new-joinee", players, payload);
-      // io.to(roomCode).emit("new-joinee", rooms[roomCode], payload);
     });
 
     socket.on("settings", (payload) => {
@@ -60,7 +53,7 @@ app.prepare().then(() => {
 
     socket.on("new-message", (payload) => {
       console.log(payload);
-      socket.to(roomCode).emit("message-received", payload);
+      socket.to(socket.data.roomCode).emit("message-received", payload);
     })
 
   });
