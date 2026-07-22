@@ -1,4 +1,3 @@
-import { rooms } from "@/server";
 import { Player } from "../types/types";
 
 export class GameEngine{
@@ -30,6 +29,26 @@ export class GameEngine{
 
     public formQueue() {
         this.turnOrder = Array.from(Object.keys(this.allPlayers));
+    };
+
+    public setSettings(payload: {
+      settingsName: string;
+      settingsVal: string | number | boolean;
+    }) {
+        switch(payload.settingsName){
+            case "totalRounds":
+                if (typeof payload.settingsVal == "number")
+                    this.totalRounds = payload.settingsVal;
+                break;
+            case "maxPlayers":
+                if (typeof payload.settingsVal == "number")
+                    this.maxPlayers = payload.settingsVal;
+                break;
+            case "drawTime":
+                if (typeof payload.settingsVal == "number")
+                    this.drawTime = payload.settingsVal;
+                break;
+        }
     };
 
     constructor(){

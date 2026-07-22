@@ -36,7 +36,6 @@ app.prepare().then(() => {
       payload.isAdmin = true;
       initializePayload(payload, socket, roomCode);
       createRoom(roomCode, payload);
-      console.log(Object.values(rooms[socket.data.roomCode].allPlayers));
       io.to(roomCode).emit("new-joinee", Object.values(rooms[socket.data.roomCode].allPlayers), payload);
     });
 
@@ -49,11 +48,11 @@ app.prepare().then(() => {
     });
 
     socket.on("settings", (payload) => {
+      rooms[socket.data.roomCode].setSettings(payload);
       socket.to(payload.roomCode).emit("lobby-settings", payload);
     });
 
     socket.on("new-message", (payload) => {
-      console.log(payload);
       socket.to(socket.data.roomCode).emit("message-received", payload);
     })
 

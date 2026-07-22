@@ -42,8 +42,6 @@ export const createGameStore = ( initState: sharedGameState & privatePayload = d
             setMaxPlayers: (maxPlayers) => { 
                 set((state) => ({ maxPlayers: maxPlayers })); 
                 socket.emit("settings", {roomCode: get().roomCode, settingsName: "maxPlayers", settingsVal: maxPlayers});
-                console.log("sent");
-
             },
 
             setDrawTime: (drawTime) => {
