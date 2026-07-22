@@ -12,6 +12,7 @@ export const defaultInitState: sharedGameState & privatePayload = {
     gamePhase: "lobby",
     drawTime: 80,
     guessWord: "",
+    overlay: { type: null },
     currPlayer: {
         id: "",
         username: "",
@@ -28,13 +29,16 @@ export const createGameStore = ( initState: sharedGameState & privatePayload = d
     return createStore<gameStore>()((set, get) => ({
         ...initState,
         actions: {
+            clearOverlay: () => set({ overlay: { type: null } }),
             incrementRound: () => set((state) => ({ currentRound: state.currentRound + 1 })),
             
             setRoomCode: (roomCode) => set((state) => ({ roomCode: roomCode })),
             newPlayers: (newPlayers) => set((state) => ({ players: newPlayers })),
             applyRemoteSettings: (settingsName, settingsVal) => set((state) => ({ [settingsName]: settingsVal })),
 
+            setWaitingOverlay: (words) => set({ overlay: { type: "waiting", words } }),
             newMessage: (newMsg) => set((state) => ({ messages: [...state.messages, newMsg] })),
+            setChoosingOverlay: (username) => set({ overlay: { type: "is-choosing", username } }),
             setUserName: (username) => set((state) => ({ currPlayer: { ...state.currPlayer, username }})),
             setCurrPlayer: (updatedFields) => set((state) => ({ currPlayer: state.currPlayer? { ...state.currPlayer, ...updatedFields } : state.currPlayer })),
 
@@ -71,6 +75,11 @@ export const createGameStore = ( initState: sharedGameState & privatePayload = d
 
             sendNewMessage: (payload: {id: string, sender: string, message: string}) => {
                 socket.emit("new-message", payload);
+            },            
+
+            submitWordChoice: (word) => {
+                socket.emit("word-chosen", word);
+                set({ overlay: { type: null }, guessWord: word });
             },
         }
     }))

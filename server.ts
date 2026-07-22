@@ -52,17 +52,29 @@ app.prepare().then(() => {
 
     socket.on("new-message", (payload) => {
       socket.to(socket.data.roomCode).emit("message-received", payload);
-    }),
+    });
 
     socket.on("start-game", () => {
       const obj = rooms[socket.data.roomCode];
 
       obj.newPhase("waiting");
       obj.formQueue();
+
       const drawer = obj.newDrawer();
       const words = obj.guessWords();
-      socket.to(drawer).emit("choose-word",);
-    })
+
+      socket.to(drawer).emit("choose-word", words);
+      io.to(socket.data.roomCode).except(drawer).emit("is-choosing", obj.allPlayers[drawer]);
+    });
+
+    socket.on("word-chosen", (word: string) => {
+      const obj = rooms[socket.data.roomCode];
+
+      if (word)
+        obj.guessWord = word;
+
+      io.to(socket.data.roomCode).emit("overlay-dismiss");
+    });
 
   });
 

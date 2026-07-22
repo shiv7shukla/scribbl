@@ -76,6 +76,7 @@ export class GameEngine{
             }
         }
 
+        this.guessWord = res[0];
         return res;
     };
 

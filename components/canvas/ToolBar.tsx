@@ -24,11 +24,11 @@ const ToolBar = ({ engineRef }: ToolbarProps) => {
     };
 
     return (
-        <div className='h-full w-full flex justify-around'>
+        <div className="flex h-full w-full items-center justify-center gap-6 rounded-lg border border-border/50 bg-muted/20 px-4 py-2">
             <input 
                 type="color" 
                 value={color}
-                className='h-20 w-20 cursor-context-pointer'
+                className="size-10 cursor-pointer rounded-md border border-border bg-transparent"
                 onChange={handleColorChange}
             />
             <input 
@@ -36,11 +36,16 @@ const ToolBar = ({ engineRef }: ToolbarProps) => {
                 min="1" 
                 max="100" 
                 value={size}
-                className='w-40 cursor-grab'
+                className="w-32 cursor-pointer accent-primary"
                 onChange={handleSizeChange}
             />
-            <button onClick={() => engineRef.current?.clear()} >
-                <Trash2 className='cursor-pointer' size={30}/>
+            <button
+                type="button"
+                onClick={() => engineRef.current?.clear()}
+                className="surface-btn flex size-10 items-center justify-center"
+                aria-label="Clear canvas"
+            >
+                <Trash2 className="size-4" />
             </button>
         </div>
     )

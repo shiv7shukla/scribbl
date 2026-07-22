@@ -37,10 +37,15 @@ export type sharedGameState = {
 	drawTime: number;
 };
 
+export type gameOverlayState =
+	| { type: null }
+	| { type: "is-choosing"; username: string }
+	| { type: "waiting"; words: string[] };
+
 export type privatePayload = {
   	guessWord: string;
+	overlay: gameOverlayState;
 };
-
 
 export type gameActions = {
 	applyRemoteSettings: (settingsName: string, settingsVal: string | number | boolean) => void;
@@ -57,6 +62,10 @@ export type gameActions = {
 	setCurrPlayer: (updatedFields: Partial<Player>) => void;
 	sendLobbySettings: (settingsName: Partial<LobbySettings>, settingsVal: string | number | boolean) => void;
 	sendNewMessage: (payload: {id: string, sender: string, message: string}) => void;
+	setChoosingOverlay: (username: string) => void;
+	setWaitingOverlay: (words: string[]) => void;
+	clearOverlay: () => void;
+	submitWordChoice: (word: string) => void;
 };
 
 export type gameStore = sharedGameState & privatePayload & {actions: gameActions};

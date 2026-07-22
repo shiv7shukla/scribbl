@@ -19,8 +19,8 @@ const LobbyChatPanel = ({ players }: { players: Player[] }) => {
       setDraft("");
   }
   return (
-    <aside className="pop-card-lg flex h-full flex-col bg-paper p-4">
-      <h2 className="mb-3 border-b-2 border-border/60 pb-3 font-display text-lg">Chat</h2>
+    <aside className="surface-card-lg flex h-full flex-col p-4">
+      <h2 className="mb-3 border-b border-border/60 pb-3 font-medium">Chat</h2>
       <ul className="flex flex-1 flex-col gap-2 overflow-y-auto pr-1">
         {messages.map((msg) => (
           <li key={msg.id} className="text-sm leading-snug">
@@ -43,12 +43,12 @@ const LobbyChatPanel = ({ players }: { players: Player[] }) => {
           onChange={(e) => setDraft(e.target.value)}
           placeholder="Type a message..."
           maxLength={200}
-          className="flex-1 rounded-xl border-[3px] border-border bg-input px-3 py-2 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/30"
+          className="flex-1 rounded-lg border border-border bg-input px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring/40"
         />
         <button
           type="submit"
           disabled={!draft.trim()}
-          className="pop-btn-primary pop-press flex size-10 items-center justify-center rounded-xl disabled:opacity-50"
+          className="surface-btn-primary flex size-10 items-center justify-center disabled:opacity-50"
           aria-label="Send message"
         >
           <Send className="size-4" />

@@ -57,11 +57,11 @@ export default function LobbyContent() {
   return (
     <div className="min-h-screen bg-background">
       <Toaster position="top-center" />
-      <header className="border-b-2 border-border/60 bg-card/80 backdrop-blur-sm h-17">
+      <header className="border-b border-border/60 bg-card/80 backdrop-blur-sm">
         <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-4 px-4 py-3">
           <Link
             href="/"
-            className="pop-btn pop-press inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold"
+            className="surface-btn inline-flex items-center gap-2 px-3 py-2 text-sm font-medium"
           >
             <Home className="size-4" />
             Home

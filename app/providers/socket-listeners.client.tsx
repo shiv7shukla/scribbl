@@ -40,13 +40,34 @@ export function SocketListeners() {
       store.getState().actions.newMessage(payload);
     }
 
+    const onIsChoosing = (player: Player) => {
+      store.getState().actions.changeGamePhase();
+      store.getState().actions.setChoosingOverlay(player.username);
+    };
+
+    const onWaiting = (words: string[]) => {
+      store.getState().actions.changeGamePhase();
+      store.getState().actions.setWaitingOverlay(words);
+    };
+
+    const onOverlayDismiss = () => {
+      store.getState().actions.clearOverlay();
+    };
+
     socket.on("new-joinee", onNewJoinee);
     socket.on("lobby-settings", onLobbySettings);
     socket.on("message-received", onMessageReceived);
+    socket.on("is-choosing", onIsChoosing);
+    socket.on("choose-word", onWaiting);
+    socket.on("overlay-dismiss", onOverlayDismiss);
 
     return () => {
       socket.off("new-joinee", onNewJoinee);
       socket.off("lobby-settings", onLobbySettings);
+      socket.off("message-received", onMessageReceived);
+      socket.off("is-choosing", onIsChoosing);
+      socket.off("choose-word", onWaiting);
+      socket.off("overlay-dismiss", onOverlayDismiss);
     };
   }, [store]);
 

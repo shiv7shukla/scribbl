@@ -30,8 +30,9 @@ export default function Canvas() {
 
         canvas.style.width = `${width}px`;
         canvas.style.height = `${height}px`;
-        canvas.style.backgroundColor = "snow";
-        canvas.style.border = `1px solid #000`;
+        canvas.style.backgroundColor = "var(--canvas)";
+        canvas.style.border = "1px solid var(--border)";
+        canvas.style.borderRadius = "var(--radius-lg)";
 
         engineRef.current = new DrawingEngine(canvas, socket);
 
