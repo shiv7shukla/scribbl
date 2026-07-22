@@ -42,6 +42,9 @@ app.prepare().then(() => {
 
     socket.on("join-created-room", (roomCode, payload) => {
       initializePayload(payload, socket, roomCode);
+      const obj = rooms[roomCode];
+      obj.allPlayers[payload.socketID] = payload;
+      obj.formQueue();
       io.to(roomCode).emit("new-joinee", Object.values(rooms[socket.data.roomCode].allPlayers), payload);
     });
 
