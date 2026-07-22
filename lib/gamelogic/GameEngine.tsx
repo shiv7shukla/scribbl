@@ -1,9 +1,10 @@
 import { Player } from "../types/types";
+import { wordBank } from "../wordBank";
 
 export class GameEngine{
     public roomCode: string;
     public allPlayers: Record<string, Player>; // socketId => Payer Object
-    public turnOrder: string[];             
+    public turnOrder: string [];             
     public currentDrawer: string;           
     public adminId: string;                 
     public guessWord: string;               
@@ -14,24 +15,24 @@ export class GameEngine{
     public drawTime: number;                
     public maxPlayers: number;
 
-    public calcGueserPoints(timeRemaining: number, drawTime: number) {
+    public calcGueserPoints (timeRemaining: number, drawTime: number) {
         const basePoints = 50;
         const bonusPoints = 50;
         const timeRatio = timeRemaining / drawTime; 
         return Math.round(basePoints + bonusPoints * timeRatio);
     };
 
-    public calculateDrawerPoints(correctGuessCount: number, totalGuessers: number) {
+    public calculateDrawerPoints (correctGuessCount: number, totalGuessers: number) {
         if (totalGuessers === 0) return 0;
         const maxDrawerPoints = 100;
         return Math.round(maxDrawerPoints * (correctGuessCount / totalGuessers));
     };
 
-    public formQueue() {
+    public formQueue () {
         this.turnOrder = Array.from(Object.keys(this.allPlayers));
     };
 
-    public setSettings(payload: {
+    public setSettings (payload: {
       settingsName: string;
       settingsVal: string | number | boolean;
     }) {
@@ -49,6 +50,33 @@ export class GameEngine{
                     this.drawTime = payload.settingsVal;
                 break;
         }
+    };
+
+    public newPhase (newPhase: "lobby" | "waiting" | "draw-and-guess" | "rounds-over") {
+        this.gamePhase = newPhase;
+    };
+
+    public newDrawer (): string {
+        const drawer = this.turnOrder.pop();
+        if (drawer)
+            this.currentDrawer = drawer;
+        return this.currentDrawer;
+    };
+
+    public guessWords (): string[] {
+        const pickedIndices = new Set();
+        const res: string[] = [];
+
+        while (pickedIndices.size < 3) {
+            const randomIndex = Math.floor(Math.random() * wordBank.length);
+
+            if (!pickedIndices.has(randomIndex)) {
+                pickedIndices.add(randomIndex);
+                res[pickedIndices.size - 1] = wordBank[randomIndex];
+            }
+        }
+
+        return res;
     };
 
     constructor(){

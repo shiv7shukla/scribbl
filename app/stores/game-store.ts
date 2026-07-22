@@ -28,7 +28,6 @@ export const createGameStore = ( initState: sharedGameState & privatePayload = d
     return createStore<gameStore>()((set, get) => ({
         ...initState,
         actions: {
-            changeGamePhase: () => set((state) => ({ gamePhase: "gaming" })),
             incrementRound: () => set((state) => ({ currentRound: state.currentRound + 1 })),
             
             setRoomCode: (roomCode) => set((state) => ({ roomCode: roomCode })),
@@ -38,6 +37,11 @@ export const createGameStore = ( initState: sharedGameState & privatePayload = d
             newMessage: (newMsg) => set((state) => ({ messages: [...state.messages, newMsg] })),
             setUserName: (username) => set((state) => ({ currPlayer: { ...state.currPlayer, username }})),
             setCurrPlayer: (updatedFields) => set((state) => ({ currPlayer: state.currPlayer? { ...state.currPlayer, ...updatedFields } : state.currPlayer })),
+
+            changeGamePhase: () => {
+                set((state) => ({ gamePhase: "gaming" }));
+                socket.emit("start-game");
+            },
 
             setMaxPlayers: (maxPlayers) => { 
                 set((state) => ({ maxPlayers: maxPlayers })); 
