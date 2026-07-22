@@ -3,6 +3,7 @@ import { createServer } from "node:http";
 import { Server, type Socket } from "socket.io";
 import type { Player } from "./lib/types/types";
 import { GameEngine } from "./lib/gamelogic/GameEngine";
+import { parse } from "node:url";
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = "localhost";
@@ -12,9 +13,14 @@ const app = next({ dev, hostname, port });
 const handler = app.getRequestHandler();
 
 export const rooms: Record<string, GameEngine> = {}; // roomCode => class object
-
+console.log("Preparing Next...");
 app.prepare().then(() => {
-  const httpServer = createServer(handler);
+  console.log("Prepared.");
+  // const httpServer = createServer(handler);
+   const httpServer = createServer((req, res) => {
+    const parsedUrl = parse(req.url!, true);
+    handler(req, res, parsedUrl);
+  });
   const io = new Server(httpServer, { transports: ["websocket"] });
   const createRoom = (roomCode: string, payload: Player) => {
     const obj = new GameEngine();
@@ -55,6 +61,7 @@ app.prepare().then(() => {
     });
 
     socket.on("start-game", () => {
+      console.log("start-game received, socket:", socket.id);
       const obj = rooms[socket.data.roomCode];
 
       obj.newPhase("waiting");

@@ -53,10 +53,12 @@ const LobbySettingsPanel = ({
     setTotalRounds, 
     setMaxPlayers,
     enterRoom,
+    startGame,
     changeGamePhase
   } = useGameStore((state) => ( state.actions ));
   const gameStart = () => {
     changeGamePhase();
+    startGame();
   }
 
   return (

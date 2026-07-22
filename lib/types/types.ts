@@ -66,6 +66,7 @@ export type gameActions = {
 	setWaitingOverlay: (words: string[]) => void;
 	clearOverlay: () => void;
 	submitWordChoice: (word: string) => void;
+	startGame: () => void;
 };
 
 export type gameStore = sharedGameState & privatePayload & {actions: gameActions};

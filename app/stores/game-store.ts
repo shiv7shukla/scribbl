@@ -41,11 +41,9 @@ export const createGameStore = ( initState: sharedGameState & privatePayload = d
             setChoosingOverlay: (username) => set({ overlay: { type: "is-choosing", username } }),
             setUserName: (username) => set((state) => ({ currPlayer: { ...state.currPlayer, username }})),
             setCurrPlayer: (updatedFields) => set((state) => ({ currPlayer: state.currPlayer? { ...state.currPlayer, ...updatedFields } : state.currPlayer })),
+            changeGamePhase: () => set((state) => ({ gamePhase: "gaming" })),
 
-            changeGamePhase: () => {
-                set((state) => ({ gamePhase: "gaming" }));
-                socket.emit("start-game");
-            },
+            startGame: () => { socket.emit("start-game"); },
 
             setMaxPlayers: (maxPlayers) => { 
                 set((state) => ({ maxPlayers: maxPlayers })); 

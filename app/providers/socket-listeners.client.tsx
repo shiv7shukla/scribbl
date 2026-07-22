@@ -1,8 +1,8 @@
 "use client";
 
-import { useContext, useEffect } from "react";
 import { socket } from "@/app/socket";
 import type { Player } from "@/lib/types/types";
+import { useContext, useEffect } from "react";
 import { GameStoreContext } from "./game-store-provider";
 
 export function SocketListeners() {
@@ -46,7 +46,6 @@ export function SocketListeners() {
     };
 
     const onWaiting = (words: string[]) => {
-      store.getState().actions.changeGamePhase();
       store.getState().actions.setWaitingOverlay(words);
     };
 
