@@ -3,9 +3,9 @@
 import { useGameStore } from '@/app/providers/game-store-provider';
 import { ChatMessage, Player } from '@/lib/types/types';
 import { Send } from 'lucide-react';
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 
-const LobbyChatPanel = ({ players }: { players: Player[] }) => {
+const ChatPanel = ({ players }: { players: Player[] }) => {
     const [draft, setDraft] = useState("");
     const { messages, currPlayer } = useGameStore((state) => state);
     const { newMessage, sendNewMessage } = useGameStore((state) => state.actions);
@@ -24,9 +24,9 @@ const LobbyChatPanel = ({ players }: { players: Player[] }) => {
       <ul className="flex flex-1 flex-col gap-2 overflow-y-auto pr-1">
         {messages.map((msg) => (
           <li key={msg.id} className="text-sm leading-snug">
-            {/* <span className="font-bold" style={{ color: msg.color }}> */}
+            <span className="font-bold">
               {msg.sender}:
-            {/* </span>{" "} */}
+            </span>{" "}
             <span>{msg.message}</span>
           </li>
         ))}
@@ -58,4 +58,4 @@ const LobbyChatPanel = ({ players }: { players: Player[] }) => {
   )
 }
 
-export default LobbyChatPanel
+export default ChatPanel

@@ -6,9 +6,9 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import LobbyChatPanel from "./LobbyChatPanel.client";
+import ChatPanel from "../ChatPanel.client";
 import { LobbySettings } from "@/lib/types/types";
-import LobbyPlayerList from "./LobbyPlayerList.client";
+import LobbyPlayerList from "../PlayerList.client";
 import LobbySettingsPanel from "./LobbySettingsPanel.client";
 import { useGameStore } from "@/app/providers/game-store-provider";
 import { useShallow } from "zustand/shallow";
@@ -75,10 +75,7 @@ export default function LobbyContent() {
 
       <main className="mx-auto grid max-w-[1600px] gap-4 p-4 lg:grid-cols-[minmax(220px,280px)_1fr_minmax(240px,320px)] lg:items-start lg:gap-5 lg:p-5">
         <div className="order-2 lg:order-1 lg:min-h-[calc(100vh-5.5rem)]">
-          <LobbyPlayerList
-            players={players.slice(0, settings.maxPlayers)}
-            maxPlayers={settings.maxPlayers}
-          />
+          <LobbyPlayerList />
         </div>
 
         <div className="order-1 lg:order-2 lg:min-h-[calc(100vh-5.5rem)]">
@@ -92,7 +89,7 @@ export default function LobbyContent() {
         </div>
 
         <div className="order-3 lg:min-h-[calc(100vh-5.5rem)]">
-          <LobbyChatPanel players={players} />
+          <ChatPanel players={players} />
         </div>
       </main>
     </div>

@@ -13,9 +13,7 @@ const app = next({ dev, hostname, port });
 const handler = app.getRequestHandler();
 
 export const rooms: Record<string, GameEngine> = {}; // roomCode => class object
-console.log("Preparing Next...");
 app.prepare().then(() => {
-  console.log("Prepared.");
   const httpServer = createServer(handler);
   const io = new Server(httpServer, { transports: ["websocket"] });
   const createRoom = (roomCode: string, payload: Player) => {
@@ -58,7 +56,6 @@ app.prepare().then(() => {
     });
 
     socket.on("start-game", () => {
-      console.log("start-game received, socket:", socket.id);
       const obj = rooms[socket.data.roomCode];
 
       obj.newPhase("waiting");
@@ -67,8 +64,10 @@ app.prepare().then(() => {
       const drawer = obj.newDrawer();
       const words = obj.guessWords();
 
+      obj.allPlayers[drawer].isDrawer = true;
+
       socket.to(drawer).emit("choose-word", words); // to the drawer
-      io.to(socket.data.roomCode).except(drawer).emit("is-choosing", obj.allPlayers[drawer]); // to the guessers
+      io.to(socket.data.roomCode).except(drawer).emit("is-choosing", obj.allPlayers[drawer], ); // to the guessers
     });
 
     socket.on("word-chosen", (word: string) => {

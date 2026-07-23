@@ -17,7 +17,7 @@ export function SocketListeners() {
     })
 
     const onNewJoinee = (players: Player[], payload: Player) => {
-      console.log("CLIENT received new-joinee:", players, "from", payload.username);
+      console.log(players);
       const { newPlayers, newMessage, setCurrPlayer } = store.getState().actions;
       setCurrPlayer({ socketID: socket.id });
       newMessage({
@@ -40,7 +40,7 @@ export function SocketListeners() {
       store.getState().actions.newMessage(payload);
     }
 
-    const onIsChoosing = (player: Player) => {
+    const onIsChoosing = (player: Player, players: Player[]) => {
       store.getState().actions.changeGamePhase();
       store.getState().actions.setChoosingOverlay(player.username);
     };
@@ -56,7 +56,6 @@ export function SocketListeners() {
       if (!store.getState().currPlayer.isDrawer)
         for (let i = 1; i <= blanks; i += 1)
           store.getState().guessWord += "_ ";
-      console.log(store.getState().guessWord);
     };
 
     socket.on("new-joinee", onNewJoinee);

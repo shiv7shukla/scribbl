@@ -2,7 +2,7 @@
 
 import { useGameStore } from '@/app/providers/game-store-provider';
 import { Player } from '@/lib/types/types';
-import { Users, Crown } from 'lucide-react';
+import { Users, Crown, Pencil, Sun } from 'lucide-react';
 import { useShallow } from 'zustand/shallow';
 
 const PLAYER_COLORS = [
@@ -20,19 +20,10 @@ const PLAYER_COLORS = [
         "#d35400",
     ];
 
-const LobbyPlayerList = ({
-//   players,
-//   maxPlayers,
-}: {
-  players: Player[];
-  maxPlayers: number;
-//   meId: string;
-}) => {
+const PlayerList = () => {
     const { 
-        totalRounds, 
         maxPlayers, 
         players,
-        drawTime, 
         currPlayer
       } = useGameStore(useShallow((state) => ({ 
         totalRounds: state.totalRounds,
@@ -46,8 +37,7 @@ const LobbyPlayerList = ({
         setTotalRounds, 
         setMaxPlayers 
     } = useGameStore((state) => state.actions);
-    const emptySlots = Math.max(0, maxPlayers - players.length);
-    
+    // console.log(currPlayer);
     return (
     <aside className="surface-card-lg flex h-full flex-col p-4">
         <div className="mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
@@ -79,27 +69,17 @@ const LobbyPlayerList = ({
                 <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
                         <span className="truncate font-medium">{player.username}</span>
-                            {player.isAdmin && (
-                                <Crown className="size-4 shrink-0 text-amber-500" aria-label="Host" />
-                            )}
+                        {player.isAdmin && (
+                            <Crown className="size-4 shrink-0 text-amber-500" aria-label="Host" />
+                        )}
+                        {player.isDrawer && (
+                            <Sun className="size-4 shrink-0 text-amber-500" aria-label="Drawer" />
+                        )}
                         {player.socketID === currPlayer.socketID && (
                             <span className="text-xs text-muted-foreground">(you)</span>
-                    )}
+                        )}
                     </div>
                 </div>
-            </li>
-            ))}
-
-            {Array.from({ length: emptySlots }).map((_, i) => (
-            <li
-                key={`empty-${i}`}
-                className="flex items-center gap-3 rounded-lg border border-dashed border-border/60 px-3 py-2.5 opacity-50"
-            >
-                <div
-                    className="size-9 shrink-0 rounded-full border border-dashed border-border bg-muted/30"
-                    style={{ backgroundColor: `${PLAYER_COLORS[(players.length + i) % PLAYER_COLORS.length]}22` }}
-                />
-                <span className="text-sm text-muted-foreground">Waiting...</span>
             </li>
             ))}
         </ul>
@@ -107,4 +87,4 @@ const LobbyPlayerList = ({
   );
 }
 
-export default LobbyPlayerList
+export default PlayerList
