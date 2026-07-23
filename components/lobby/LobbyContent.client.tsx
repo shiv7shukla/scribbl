@@ -13,7 +13,6 @@ import LobbySettingsPanel from "./LobbySettingsPanel.client";
 import { useGameStore } from "@/app/providers/game-store-provider";
 import { useShallow } from "zustand/shallow";
 
-
 const PLAYER_COLORS = [
         "#e74c3c",
         "#3498db",

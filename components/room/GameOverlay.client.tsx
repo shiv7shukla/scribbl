@@ -56,7 +56,7 @@ export default function GameOverlay() {
             <p className="text-lg text-muted-foreground">Word selection</p>
             <p className="mt-2 font-display text-2xl">
               <span className="text-primary">{overlay.username}</span>
-              {" "}is choosing the word
+              {"  "}is choosing the word
             </p>
           </>
         )}

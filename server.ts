@@ -16,11 +16,7 @@ export const rooms: Record<string, GameEngine> = {}; // roomCode => class object
 console.log("Preparing Next...");
 app.prepare().then(() => {
   console.log("Prepared.");
-  // const httpServer = createServer(handler);
-   const httpServer = createServer((req, res) => {
-    const parsedUrl = parse(req.url!, true);
-    handler(req, res, parsedUrl);
-  });
+  const httpServer = createServer(handler);
   const io = new Server(httpServer, { transports: ["websocket"] });
   const createRoom = (roomCode: string, payload: Player) => {
     const obj = new GameEngine();
@@ -57,7 +53,8 @@ app.prepare().then(() => {
     });
 
     socket.on("new-message", (payload) => {
-      socket.to(socket.data.roomCode).emit("message-received", payload);
+      if (rooms[socket.data.roomCode].currentDrawer !== socket.id)
+        socket.to(socket.data.roomCode).emit("message-received", payload);
     });
 
     socket.on("start-game", () => {
@@ -70,8 +67,8 @@ app.prepare().then(() => {
       const drawer = obj.newDrawer();
       const words = obj.guessWords();
 
-      socket.to(drawer).emit("choose-word", words);
-      io.to(socket.data.roomCode).except(drawer).emit("is-choosing", obj.allPlayers[drawer]);
+      socket.to(drawer).emit("choose-word", words); // to the drawer
+      io.to(socket.data.roomCode).except(drawer).emit("is-choosing", obj.allPlayers[drawer]); // to the guessers
     });
 
     socket.on("word-chosen", (word: string) => {
@@ -80,7 +77,7 @@ app.prepare().then(() => {
       if (word)
         obj.guessWord = word;
 
-      io.to(socket.data.roomCode).emit("overlay-dismiss");
+      io.to(socket.data.roomCode).emit("overlay-dismiss", obj.guessWord.length);
     });
 
   });

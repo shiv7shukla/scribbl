@@ -4,11 +4,13 @@ import { DrawingEngine } from "@/lib/drawingcanvas/DrawingEngine";
 import { useEffect, useRef } from "react";
 import ToolBar from "./ToolBar";
 import { socket } from "@/app/socket";
+import { useGameStore } from "@/app/providers/game-store-provider";
 
 export default function Canvas() {
     const engineRef = useRef<DrawingEngine>(null);
     const divRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const currPlayer = useGameStore((state) => state.currPlayer);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -60,6 +62,10 @@ export default function Canvas() {
         }
     }, []);
 
+    useEffect(() => {
+        engineRef.current?.invertInputEnabled(currPlayer.isDrawer);
+    }, [currPlayer.isDrawer]);
+
     return (
         <div className="h-full w-full">
             <div
@@ -67,9 +73,13 @@ export default function Canvas() {
                 ref={divRef}
             >
                 <canvas id="drawingCanvas" ref={canvasRef} className="w-full" />
-                <div className="flex h-auto w-full items-center justify-center">
-                    <ToolBar engineRef={engineRef} />
-                </div>
+                {
+                    currPlayer.isDrawer ?
+                        <div className="flex h-auto w-full items-center justify-center">
+                            <ToolBar engineRef={engineRef} />
+                        </div> :
+                        null
+                }
             </div>
         </div>
     );

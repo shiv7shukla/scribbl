@@ -14,6 +14,8 @@ const RoomContent = ({ roomId }: { roomId: string }) => {
   const gamePhase = useGameStore((state) => state.gamePhase);
   const roomCode = useGameStore((state) => state.roomCode);
   const players = useGameStore((state) => state.players);
+  const guessWord = useGameStore((state) => state.guessWord);
+  const currPlayer = useGameStore((state) => state.currPlayer);
   const { setRoomCode } = useGameStore((state) => state.actions);
 
   useEffect(() => {
@@ -38,7 +40,7 @@ const RoomContent = ({ roomId }: { roomId: string }) => {
             Home
           </Link>
           <div className="text-center">
-            <h1 className="font-display text-lg tracking-tight">scribbl</h1>
+            <h1 className="font-display text-2xl text-white tracking-tight">{guessWord}</h1>
             <p className="text-xs text-muted-foreground">{roomCode}</p>
           </div>
           <div className="text-right text-xs text-muted-foreground">
@@ -47,7 +49,7 @@ const RoomContent = ({ roomId }: { roomId: string }) => {
         </div>
       </header>
 
-      <main className="relative mx-auto flex min-h-[calc(100vh-3.5rem)] max-w-[1600px] flex-col gap-4 p-4 lg:flex-row">
+      <main className="relative mx-auto flex min-h-[calc(100vh-5rem)] max-w-[1600px] flex-col gap-4 p-4 lg:flex-row">
         <aside className="surface-card order-2 flex-1 p-4 lg:order-1">
           <h2 className="mb-3 text-sm font-medium text-muted-foreground">Players</h2>
           <ul className="space-y-2">
@@ -71,7 +73,7 @@ const RoomContent = ({ roomId }: { roomId: string }) => {
           </ul>
         </aside>
 
-        <section className="surface-card relative order-1 flex-[2] overflow-hidden p-4 lg:order-2">
+        <section className="surface-card relative order-1 flex-[3] overflow-hidden p-4 lg:order-2">
           <Canvas />
           <GameOverlay />
         </section>

@@ -46,11 +46,17 @@ export function SocketListeners() {
     };
 
     const onWaiting = (words: string[]) => {
+      store.getState().actions.changeGamePhase();
       store.getState().actions.setWaitingOverlay(words);
+      store.getState().actions.setCurrPlayer({ isDrawer: true });
     };
 
-    const onOverlayDismiss = () => {
+    const onOverlayDismiss = (blanks: number) => {
       store.getState().actions.clearOverlay();
+      if (!store.getState().currPlayer.isDrawer)
+        for (let i = 1; i <= blanks; i += 1)
+          store.getState().guessWord += "_ ";
+      console.log(store.getState().guessWord);
     };
 
     socket.on("new-joinee", onNewJoinee);
