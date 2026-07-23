@@ -73,7 +73,7 @@ const PlayerList = () => {
                             <Crown className="size-4 shrink-0 text-amber-500" aria-label="Host" />
                         )}
                         {player.isDrawer && (
-                            <Sun className="size-4 shrink-0 text-amber-500" aria-label="Drawer" />
+                            <Pencil className="size-4 shrink-0 text-amber-500" aria-label="Drawer" />
                         )}
                         {player.socketID === currPlayer.socketID && (
                             <span className="text-xs text-muted-foreground">(you)</span>

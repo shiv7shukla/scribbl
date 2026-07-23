@@ -22,10 +22,6 @@ export default function GameOverlay() {
       setSecondsLeft((prev) => {
         if (prev <= 1) {
           clearInterval(interval);
-          if (!hasSubmitted.current) {
-            hasSubmitted.current = true;
-            submitWordChoice("");
-          }
           return 0;
         }
         return prev - 1;
@@ -33,7 +29,14 @@ export default function GameOverlay() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [overlay, submitWordChoice]);
+  }, [overlay]);
+
+  useEffect(() => {
+    if (overlay.type === "waiting" && secondsLeft === 0 && !hasSubmitted.current) {
+      hasSubmitted.current = true;
+      submitWordChoice("");
+  }
+}, [secondsLeft, overlay.type, submitWordChoice]);
 
   if (overlay.type === null) return null;
 

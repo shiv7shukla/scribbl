@@ -40,9 +40,12 @@ export function SocketListeners() {
       store.getState().actions.newMessage(payload);
     }
 
-    const onIsChoosing = (player: Player, players: Player[]) => {
+    const onIsChoosing = (player: Player) => {
       store.getState().actions.changeGamePhase();
       store.getState().actions.setChoosingOverlay(player.username);
+      const drawer = store.getState().players.find(p => p.socketID === player.socketID);
+      if (drawer)
+        drawer.isDrawer = true;
     };
 
     const onWaiting = (words: string[]) => {

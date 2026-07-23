@@ -43,6 +43,9 @@ const RoomContent = ({ roomId }: { roomId: string }) => {
             Home
           </Link> */}
           <div className="text-center">
+            <h1 className="font-display text-2xl text-white tracking-tight">scribbl</h1>
+          </div>
+          <div className="text-center">
             <h1 className="font-display text-2xl text-white tracking-tight">{guessWord}</h1>
             <p className="text-xs text-muted-foreground">{roomCode}</p>
           </div>
@@ -58,7 +61,7 @@ const RoomContent = ({ roomId }: { roomId: string }) => {
           <PlayerList />
         </aside>
 
-        <section className=" relative order-1 flex-[3] overflow-hidden p-4 lg:order-2">
+        <section className="order-1 relative order-1 flex-[3] overflow-hidden p-4 lg:order-2">
           <Canvas />
           <GameOverlay />
         </section>
