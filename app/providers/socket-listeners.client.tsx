@@ -60,11 +60,11 @@ export function SocketListeners() {
           store.getState().guessWord += "_ ";
     };
 
-    const onCorrectGuess = (payload: {id: string, sender: string, message: string}, sID: string) =>{
-      store.getState().actions.newMessage(payload);
-      const guesser = store.getState().players.find((p) => p.socketID === sID);
-      if (guesser)
-        guesser.hasCorrectlyGuessed = true;
+    const onCorrectGuess = (payload: {id: string, sender: string, message: string}, sID: string) => {
+      console.log("received correct-guess, sID:", sID, "known players:", store.getState().players.map(p => p.socketID));
+      if (store.getState().currPlayer.socketID !== sID)
+        store.getState().actions.newMessage(payload);
+      store.getState().actions.markCorrectGuess(sID);
     };
 
     socket.on("new-joinee", onNewJoinee);
@@ -74,6 +74,7 @@ export function SocketListeners() {
     socket.on("choose-word", onWaiting);
     socket.on("overlay-dismiss", onOverlayDismiss);
     socket.on("correct-guess", onCorrectGuess);
+    
 
     return () => {
       socket.off("new-joinee", onNewJoinee);

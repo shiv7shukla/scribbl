@@ -67,6 +67,7 @@ export type gameActions = {
 	clearOverlay: () => void;
 	submitWordChoice: (word: string) => void;
 	startGame: () => void;
+	markCorrectGuess: (socketID: string) => void;
 };
 
 export type gameStore = sharedGameState & privatePayload & {actions: gameActions};

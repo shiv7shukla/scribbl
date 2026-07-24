@@ -42,6 +42,7 @@ export const createGameStore = ( initState: sharedGameState & privatePayload = d
             setUserName: (username) => set((state) => ({ currPlayer: { ...state.currPlayer, username }})),
             setCurrPlayer: (updatedFields) => set((state) => ({ currPlayer: state.currPlayer? { ...state.currPlayer, ...updatedFields } : state.currPlayer })),
             changeGamePhase: () => set((state) => ({ gamePhase: "gaming" })),
+            markCorrectGuess: (socketID: string) => set((state) => ({ players: state.players.map((p) => p.socketID === socketID ? { ...p, hasCorrectlyGuessed: true } : p )})),
 
             startGame: () => { socket.emit("start-game"); },
 

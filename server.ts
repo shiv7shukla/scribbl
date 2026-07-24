@@ -51,10 +51,13 @@ app.prepare().then(() => {
     });
 
     socket.on("new-message", (payload) => {
-      if (rooms[socket.data.roomCode].currentDrawer !== socket.id && payload.message === rooms[socket.data.roomCode].guessWord)
+      if (rooms[socket.data.roomCode].currentDrawer !== socket.id)
       {
-        if (payload.message === rooms[socket.data.roomCode].guessWord)
-          socket.to(socket.data.roomCode).emit("correct-guess", payload, socket.id);
+        console.log("guessWord:", rooms[socket.data.roomCode].guessWord, "| said:", payload.message, "| currentDrawer:", rooms[socket.data.roomCode].currentDrawer, "| socket:", socket.id);
+        if (payload.message === rooms[socket.data.roomCode].guessWord) {
+          console.log("emitting correct-guess to room", socket.data.roomCode, "for", socket.id);
+          io.to(socket.data.roomCode).emit("correct-guess", payload, socket.id);
+        }
         else
           socket.to(socket.data.roomCode).emit("message-received", payload);
       }
