@@ -51,8 +51,13 @@ app.prepare().then(() => {
     });
 
     socket.on("new-message", (payload) => {
-      if (rooms[socket.data.roomCode].currentDrawer !== socket.id)
-        socket.to(socket.data.roomCode).emit("message-received", payload);
+      if (rooms[socket.data.roomCode].currentDrawer !== socket.id && payload.message === rooms[socket.data.roomCode].guessWord)
+      {
+        if (payload.message === rooms[socket.data.roomCode].guessWord)
+          socket.to(socket.data.roomCode).emit("correct-guess", payload, socket.id);
+        else
+          socket.to(socket.data.roomCode).emit("message-received", payload);
+      }
     });
 
     socket.on("start-game", () => {

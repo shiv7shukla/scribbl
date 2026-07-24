@@ -29,12 +29,12 @@ export default function GameOverlay() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [overlay]);
+  }, [overlay.type]);
 
   useEffect(() => {
     if (overlay.type === "waiting" && secondsLeft === 0 && !hasSubmitted.current) {
       hasSubmitted.current = true;
-      submitWordChoice("");
+      submitWordChoice(overlay.words[0]);
   }
 }, [secondsLeft, overlay.type, submitWordChoice]);
 
@@ -45,7 +45,6 @@ export default function GameOverlay() {
     hasSubmitted.current = true;
     submitWordChoice(word);
   };
-
   const progress = overlay.type === "waiting" ? (secondsLeft / CHOICE_SECONDS) * 100 : 0;
 
   return (

@@ -51,7 +51,7 @@ const RoomContent = ({ roomId }: { roomId: string }) => {
           </div>
           <div className="text-right text-xs text-muted-foreground">
             {overlay.type === null ?
-            <h1 className="font-display text-2xl text-white tracking-tight"><CountdownTimer /></h1> : null}
+            <h1 className="font-display text-2xl text-white tracking-tight tabular-nums"><CountdownTimer /></h1> : null}
           </div>
         </div>
       </header>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useGameStore } from '@/app/providers/game-store-provider';
-import { Player } from '@/lib/types/types';
 import { Users, Crown, Pencil, Sun } from 'lucide-react';
 import { useShallow } from 'zustand/shallow';
 
@@ -37,7 +36,7 @@ const PlayerList = () => {
         setTotalRounds, 
         setMaxPlayers 
     } = useGameStore((state) => state.actions);
-    // console.log(currPlayer);
+    console.log(players);
     return (
     <aside className="surface-card-lg flex h-full flex-col p-4">
         <div className="mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
@@ -52,10 +51,11 @@ const PlayerList = () => {
             {players.map((player) => (
             <li
                 key={player.id}
-                className={`flex items-center gap-3 rounded-lg border px-3 py-2.5 ${
-                player.username === currPlayer.username
-                    ? "border-primary/30 bg-primary/5"
-                    : "border-border/50 bg-background/50"
+                className={`flex items-center gap-3 rounded-lg border px-3 py-2.5
+                ${player.hasCorrectlyGuessed === true
+                    ? "border-primary/30 bg-success text-success-foreground"
+                    : player.username === currPlayer.username ?
+                        "border-primary/30 bg-primary/5": "border-border/50 bg-background/50"
                 }`
             }
             >

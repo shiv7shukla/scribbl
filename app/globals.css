@@ -39,6 +39,9 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-success-muted: var(--success-muted);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -82,6 +85,9 @@
   --sidebar-border: oklch(0.3 0.022 265);
   --sidebar-ring: oklch(0.62 0.1 280);
   --canvas: oklch(0.97 0.005 265);
+  --success: oklch(0.74 0.16 145);
+  --success-foreground: oklch(0.16 0.015 145);
+  --success-muted: oklch(0.28 0.05 145);
 }
 
 @layer base {

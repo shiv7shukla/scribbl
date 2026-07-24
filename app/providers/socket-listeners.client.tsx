@@ -36,7 +36,6 @@ export function SocketListeners() {
     };
 
     const onMessageReceived = (payload: {id: string, sender: string, message: string}) => {
-      console.log(payload);
       store.getState().actions.newMessage(payload);
     }
 
@@ -61,12 +60,20 @@ export function SocketListeners() {
           store.getState().guessWord += "_ ";
     };
 
+    const onCorrectGuess = (payload: {id: string, sender: string, message: string}, sID: string) =>{
+      store.getState().actions.newMessage(payload);
+      const guesser = store.getState().players.find((p) => p.socketID === sID);
+      if (guesser)
+        guesser.hasCorrectlyGuessed = true;
+    };
+
     socket.on("new-joinee", onNewJoinee);
     socket.on("lobby-settings", onLobbySettings);
     socket.on("message-received", onMessageReceived);
     socket.on("is-choosing", onIsChoosing);
     socket.on("choose-word", onWaiting);
     socket.on("overlay-dismiss", onOverlayDismiss);
+    socket.on("correct-guess", onCorrectGuess);
 
     return () => {
       socket.off("new-joinee", onNewJoinee);
@@ -75,6 +82,8 @@ export function SocketListeners() {
       socket.off("is-choosing", onIsChoosing);
       socket.off("choose-word", onWaiting);
       socket.off("overlay-dismiss", onOverlayDismiss);
+      socket.off("correct-guess", onCorrectGuess);
+
     };
   }, [store]);
 
