@@ -31,11 +31,6 @@ const PlayerList = () => {
         currPlayer: state.currPlayer,
         drawTime: state.drawTime,
        })));
-    const {
-        setDrawTime, 
-        setTotalRounds, 
-        setMaxPlayers 
-    } = useGameStore((state) => state.actions);
     console.log(players);
     return (
     <aside className="surface-card-lg flex h-full flex-col p-4">

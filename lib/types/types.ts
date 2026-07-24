@@ -35,6 +35,8 @@ export type sharedGameState = {
 	currPlayer: Player;
 	gamePhase: string;
 	drawTime: number;
+	minutes: number;
+	seconds: number;
 };
 
 export type gameOverlayState =
@@ -61,13 +63,14 @@ export type gameActions = {
 	newPlayers: (newPlayers: Player []) => void;
 	setCurrPlayer: (updatedFields: Partial<Player>) => void;
 	sendLobbySettings: (settingsName: Partial<LobbySettings>, settingsVal: string | number | boolean) => void;
-	sendNewMessage: (payload: {id: string, sender: string, message: string}) => void;
+	sendNewMessage: (payload: {id: string, sender: string, message: string, minutes: number, seconds: number}) => void;
 	setChoosingOverlay: (username: string) => void;
 	setWaitingOverlay: (words: string[]) => void;
 	clearOverlay: () => void;
 	submitWordChoice: (word: string) => void;
 	startGame: () => void;
 	markCorrectGuess: (socketID: string) => void;
+	setTime: (time: string, val: number) => void;
 };
 
 export type gameStore = sharedGameState & privatePayload & {actions: gameActions};

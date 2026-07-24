@@ -13,6 +13,8 @@ export const defaultInitState: sharedGameState & privatePayload = {
     drawTime: 80,
     guessWord: "",
     overlay: { type: null },
+    minutes: 0,
+    seconds: 0,
     currPlayer: {
         id: "",
         username: "",
@@ -43,6 +45,7 @@ export const createGameStore = ( initState: sharedGameState & privatePayload = d
             setCurrPlayer: (updatedFields) => set((state) => ({ currPlayer: state.currPlayer? { ...state.currPlayer, ...updatedFields } : state.currPlayer })),
             changeGamePhase: () => set((state) => ({ gamePhase: "gaming" })),
             markCorrectGuess: (socketID: string) => set((state) => ({ players: state.players.map((p) => p.socketID === socketID ? { ...p, hasCorrectlyGuessed: true } : p )})),
+            setTime: (time, val) => set((state) => ({ [time]: val })),
 
             startGame: () => { socket.emit("start-game"); },
 
@@ -72,7 +75,7 @@ export const createGameStore = ( initState: sharedGameState & privatePayload = d
                 socket.emit("settings", {settingsName, settingsVal});
             },
 
-            sendNewMessage: (payload: {id: string, sender: string, message: string}) => {
+            sendNewMessage: (payload: {id: string, sender: string, message: string, minutes: number, seconds: number}) => {
                 socket.emit("new-message", payload);
             },            
 

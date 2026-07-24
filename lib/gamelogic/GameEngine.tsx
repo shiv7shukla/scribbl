@@ -80,6 +80,14 @@ export class GameEngine{
         return res;
     };
 
+    public setPoints (minutes: number, seconds: number, role: "guesser" | "drawer", socketId: string) {
+        const time = (minutes * 60) + seconds;
+        if (role === "guesser")
+            this.allPlayers[socketId].score += this.calcGueserPoints(time, this.drawTime);
+        else
+            this.allPlayers[socketId].score += this.calcGueserPoints(time, this.drawTime);
+    };
+
     constructor(){
         this.roomCode = "";
         this.adminId = "";

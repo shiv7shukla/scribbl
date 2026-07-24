@@ -51,12 +51,12 @@ app.prepare().then(() => {
     });
 
     socket.on("new-message", (payload) => {
-      if (rooms[socket.data.roomCode].currentDrawer !== socket.id)
+      const obj = rooms[socket.data.roomCode];
+      if (obj.currentDrawer !== socket.id)
       {
-        console.log("guessWord:", rooms[socket.data.roomCode].guessWord, "| said:", payload.message, "| currentDrawer:", rooms[socket.data.roomCode].currentDrawer, "| socket:", socket.id);
-        if (payload.message === rooms[socket.data.roomCode].guessWord) {
-          console.log("emitting correct-guess to room", socket.data.roomCode, "for", socket.id);
-          io.to(socket.data.roomCode).emit("correct-guess", payload, socket.id);
+        if (payload.message === obj.guessWord && obj.gamePhase === "draw-and-guess") {
+          obj.setPoints(payload.minutes, payload.seconds, "guesser", socket.id);
+          io.to(socket.data.roomCode).emit("correct-guess", payload, socket.id, Object.values(obj.allPlayers));
         }
         else
           socket.to(socket.data.roomCode).emit("message-received", payload);
@@ -80,6 +80,7 @@ app.prepare().then(() => {
 
     socket.on("word-chosen", (word: string) => {
       const obj = rooms[socket.data.roomCode];
+      obj.newPhase("draw-and-guess");
 
       if (word)
         obj.guessWord = word;

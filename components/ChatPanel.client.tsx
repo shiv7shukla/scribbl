@@ -4,10 +4,21 @@ import { useGameStore } from '@/app/providers/game-store-provider';
 import { ChatMessage, Player } from '@/lib/types/types';
 import { Send } from 'lucide-react';
 import React, { useState } from 'react';
+import { useShallow } from 'zustand/shallow';
 
 const ChatPanel = ({ players }: { players: Player[] }) => {
     const [draft, setDraft] = useState("");
-    const { messages, currPlayer } = useGameStore((state) => state);
+    const { 
+      messages, 
+      currPlayer,
+      minutes,
+      seconds
+    } = useGameStore(useShallow((state) => ({
+      messages: state.messages,
+      currPlayer: state.currPlayer,
+      minutes: state.minutes,
+      seconds: state.seconds
+    })));
     const { newMessage, sendNewMessage } = useGameStore((state) => state.actions);
 
     function sendMessage() {
@@ -15,7 +26,7 @@ const ChatPanel = ({ players }: { players: Player[] }) => {
       if (!text) return;
       const id = crypto.randomUUID();
       newMessage({id, sender: currPlayer.username, message: text});
-      sendNewMessage({id, sender: currPlayer.username, message: text});
+      sendNewMessage({id, sender: currPlayer.username, message: text, minutes, seconds});
       setDraft("");
   }
   return (
