@@ -1,7 +1,7 @@
 "use client";
 
 import { useGameStore } from '@/app/providers/game-store-provider';
-import { Users, Crown, Pencil, Sun } from 'lucide-react';
+import { Users, Crown, Pencil, } from 'lucide-react';
 import { useShallow } from 'zustand/shallow';
 
 const PLAYER_COLORS = [
@@ -73,8 +73,10 @@ const PlayerList = () => {
                         {player.socketID === currPlayer.socketID && (
                             <span className="text-xs text-muted-foreground">(you)</span>
                         )}
+                        {player.score}
                     </div>
                 </div>
+
             </li>
             ))}
         </ul>

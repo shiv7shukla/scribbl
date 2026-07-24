@@ -17,7 +17,6 @@ const RoomContent = ({ roomId }: { roomId: string }) => {
   const roomCode = useGameStore((state) => state.roomCode);
   const players = useGameStore((state) => state.players);
   const guessWord = useGameStore((state) => state.guessWord);
-  const currPlayer = useGameStore((state) => state.currPlayer);
   const overlay = useGameStore((state) => state.overlay);
   const { setRoomCode } = useGameStore((state) => state.actions);
 

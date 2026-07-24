@@ -64,7 +64,7 @@ export function SocketListeners() {
       console.log("received correct-guess, sID:", sID, "known players:", store.getState().players.map(p => p.socketID));
       if (store.getState().currPlayer.socketID !== sID)
         store.getState().actions.newMessage(payload);
-      store.getState().actions.markCorrectGuess(sID);
+      // store.getState().actions.markCorrectGuess(sID);
       store.getState().actions.newPlayers(players);
     };
 

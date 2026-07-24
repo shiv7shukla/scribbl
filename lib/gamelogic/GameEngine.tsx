@@ -82,8 +82,10 @@ export class GameEngine{
 
     public setPoints (minutes: number, seconds: number, role: "guesser" | "drawer", socketId: string) {
         const time = (minutes * 60) + seconds;
-        if (role === "guesser")
+        if (role === "guesser") {
             this.allPlayers[socketId].score += this.calcGueserPoints(time, this.drawTime);
+            this.allPlayers[socketId].hasCorrectlyGuessed = true;
+        }
         else
             this.allPlayers[socketId].score += this.calcGueserPoints(time, this.drawTime);
     };
