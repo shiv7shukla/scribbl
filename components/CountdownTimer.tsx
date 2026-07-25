@@ -7,31 +7,34 @@ const CountdownTimer = () => {
     const { setTime, newTurn, scoreBoard } = useGameStore((state) => state.actions);
     const drawTime = useGameStore((state) => state.drawTime);
     const [ minutes, setMinutes ] = useState(Math.floor(drawTime / 60));
-    const [seconds, setSeconds ] =  useState(drawTime % 60);
+    const [seconds, setSeconds ] =  useState(drawTime);
 
     useEffect(() => {
         let myInterval = setInterval(() => {
-            if (seconds > 0) {
-                setSeconds(seconds - 1);
-                setTime("seconds", seconds-1);
-            }
-            if (seconds === 0) {
-                if (minutes === 0) {
-                    clearInterval(myInterval);
-                    scoreBoard();
-                }
+            setSeconds(prev => {
+                if (prev > 0) return prev - 1;
                 else {
-                    setMinutes(minutes - 1);
-                    setTime("minutes", minutes-1);
-                    setSeconds(59);
-                    setTime("seconds", 59);
+                    setMinutes(minute => {
+                        if (minute > 0) return minute - 1;
+                        else {
+                            clearInterval(myInterval);
+                            return 0;
+                        }
+                    })
+                    return 59;
                 }
-            } 
+            })
         }, 1000)
         return ()=> {
             clearInterval(myInterval);
           };
     });
+
+    useEffect(() => {
+        setTime("seconds", seconds);
+        setTime("minutes", minutes);
+        if (seconds === 0 && minutes === 0) scoreBoard();
+    }, [seconds, minutes]);
 
     return (
         <div>
