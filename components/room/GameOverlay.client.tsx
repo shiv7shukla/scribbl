@@ -3,14 +3,21 @@
 import { useGameStore } from "@/app/providers/game-store-provider";
 import { useEffect, useRef, useState } from "react";
 import { Clock, Pencil } from "lucide-react";
+import { useShallow } from "zustand/shallow";
 
 const CHOICE_SECONDS = 15;
 
 export default function GameOverlay() {
-  const overlay = useGameStore((state) => state.overlay);
-  const { submitWordChoice } = useGameStore((state) => state.actions);
+  const { submitWordChoice, clearOverlay } = useGameStore((state) => state.actions);
   const [secondsLeft, setSecondsLeft] = useState(CHOICE_SECONDS);
   const hasSubmitted = useRef(false);
+  const {
+     overlay,
+     players 
+    } = useGameStore(useShallow((state) => ({
+    overlay: state.overlay,
+    players: state.players
+})));
 
   useEffect(() => {
     if (overlay.type !== "waiting") return;
@@ -36,6 +43,8 @@ export default function GameOverlay() {
       hasSubmitted.current = true;
       submitWordChoice(overlay.words[0]);
   }
+  else if (overlay.type === "score-board" && secondsLeft === 0)
+    clearOverlay();
 }, [secondsLeft, overlay.type, submitWordChoice]);
 
   if (overlay.type === null) return null;
@@ -91,6 +100,23 @@ export default function GameOverlay() {
                 >
                   {word}
                 </button>
+              ))}
+            </div>
+          </>
+        )}
+
+        {overlay.type === "score-board" && (
+          <>
+            <div className="mt-8 flex flex-col gap-3">
+              {players.map((p) => (
+                <div
+                  key={p.socketID}
+                  className="surface-btn w-full py-3.5 font-medium transition-colors"
+                >
+                  {p.username}
+                  {" "}
+                  {p.score}
+                </div>
               ))}
             </div>
           </>

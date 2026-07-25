@@ -71,9 +71,9 @@ export const createGameStore = ( initState: sharedGameState & privatePayload = d
                     socket.emit("join-created-room", get().roomCode, payload);
             },
 
-            sendLobbySettings: (settingsName, settingsVal) => {
-                socket.emit("settings", {settingsName, settingsVal});
-            },
+            // sendLobbySettings: (settingsName, settingsVal) => {
+            //     socket.emit("settings", {settingsName, settingsVal});
+            // },
 
             sendNewMessage: (payload: {id: string, sender: string, message: string, minutes: number, seconds: number}) => {
                 socket.emit("new-message", payload);
@@ -82,6 +82,18 @@ export const createGameStore = ( initState: sharedGameState & privatePayload = d
             submitWordChoice: (word) => {
                 socket.emit("word-chosen", word);
                 set({ overlay: { type: null }, guessWord: word });
+            },
+
+            newTurn: () => {
+                socket.emit("new-turn");
+            },
+
+            scoreBoard: () => {
+                socket.emit("score-board");
+                set((state) => ({
+                    overlay: { type: "score-board" },
+                    players: state.players.map((p) => p.hasCorrectlyGuessed === true ? { ...p, hasCorrectlyGuessed: false } : p )
+                }))
             },
         }
     }))

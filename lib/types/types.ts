@@ -42,7 +42,8 @@ export type sharedGameState = {
 export type gameOverlayState =
 	| { type: null }
 	| { type: "is-choosing"; username: string }
-	| { type: "waiting"; words: string[] };
+	| { type: "waiting"; words: string[] }
+	| { type: "score-board"};
 
 export type privatePayload = {
   	guessWord: string;
@@ -50,27 +51,29 @@ export type privatePayload = {
 };
 
 export type gameActions = {
-	applyRemoteSettings: (settingsName: string, settingsVal: string | number | boolean) => void;
-	newMessage: (newMsg: {id: string, sender: string, message: string}) => void;
+	newTurn: () => void;
+	startGame: () => void;
+	scoreBoard: () => void;
+	clearOverlay: () => void;
 	incrementRound: () => void;
 	changeGamePhase: () => void;
-	enterRoom: (payload: Player, admin: boolean) => void;
 	setDrawTime: (time: number) => void;
 	setRoomCode: (roomCode: string) => void;
 	setUserName: (username: string) => void;
-	setTotalRounds: (totalRounds: number) => void;
+	submitWordChoice: (word: string) => void;
 	setMaxPlayers: (maxPlayers: number) => void;
 	newPlayers: (newPlayers: Player []) => void;
-	setCurrPlayer: (updatedFields: Partial<Player>) => void;
-	sendLobbySettings: (settingsName: Partial<LobbySettings>, settingsVal: string | number | boolean) => void;
-	sendNewMessage: (payload: {id: string, sender: string, message: string, minutes: number, seconds: number}) => void;
-	setChoosingOverlay: (username: string) => void;
 	setWaitingOverlay: (words: string[]) => void;
-	clearOverlay: () => void;
-	submitWordChoice: (word: string) => void;
-	startGame: () => void;
 	markCorrectGuess: (socketID: string) => void;
 	setTime: (time: string, val: number) => void;
+	setTotalRounds: (totalRounds: number) => void;
+	setChoosingOverlay: (username: string) => void;
+	enterRoom: (payload: Player, admin: boolean) => void;
+	setCurrPlayer: (updatedFields: Partial<Player>) => void;
+	newMessage: (newMsg: {id: string, sender: string, message: string}) => void;
+	applyRemoteSettings: (settingsName: string, settingsVal: string | number | boolean) => void;
+	// sendLobbySettings: (settingsName: Partial<LobbySettings>, settingsVal: string | number | boolean) => void;
+	sendNewMessage: (payload: {id: string, sender: string, message: string, minutes: number, seconds: number}) => void;
 };
 
 export type gameStore = sharedGameState & privatePayload & {actions: gameActions};

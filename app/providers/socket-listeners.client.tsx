@@ -61,12 +61,21 @@ export function SocketListeners() {
     };
 
     const onCorrectGuess = (payload: {id: string, sender: string, message: string}, sID: string, players: Player[]) => {
-      console.log("received correct-guess, sID:", sID, "known players:", store.getState().players.map(p => p.socketID));
       if (store.getState().currPlayer.socketID !== sID)
         store.getState().actions.newMessage(payload);
-      // store.getState().actions.markCorrectGuess(sID);
+      store.getState().actions.markCorrectGuess(sID);
       store.getState().actions.newPlayers(players);
     };
+
+    const onScores = (players: Player[]) => {
+      store.getState().actions.newPlayers(players);
+    };
+
+    const allSettings = (payload: [{settingsName: string, settingsVal: string | number}]) => {
+      payload.map((p) => {
+        store.getState().actions.applyRemoteSettings(p.settingsName, p.settingsVal);
+      })
+    }
 
     socket.on("new-joinee", onNewJoinee);
     socket.on("lobby-settings", onLobbySettings);
@@ -75,6 +84,8 @@ export function SocketListeners() {
     socket.on("choose-word", onWaiting);
     socket.on("overlay-dismiss", onOverlayDismiss);
     socket.on("correct-guess", onCorrectGuess);
+    socket.on("scores", onScores);
+    socket.on("all-lobby-settings", allSettings);
     
 
     return () => {
@@ -85,6 +96,8 @@ export function SocketListeners() {
       socket.off("choose-word", onWaiting);
       socket.off("overlay-dismiss", onOverlayDismiss);
       socket.off("correct-guess", onCorrectGuess);
+      socket.off("scores", onScores);
+      socket.off("all-lobby-settings", allSettings);
 
     };
   }, [store]);

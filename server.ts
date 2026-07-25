@@ -3,7 +3,6 @@ import { createServer } from "node:http";
 import { Server, type Socket } from "socket.io";
 import type { Player } from "./lib/types/types";
 import { GameEngine } from "./lib/gamelogic/GameEngine";
-import { parse } from "node:url";
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = "localhost";
@@ -43,6 +42,12 @@ app.prepare().then(() => {
       const obj = rooms[roomCode];
       obj.allPlayers[payload.socketID] = payload;
       io.to(roomCode).emit("new-joinee", Object.values(rooms[socket.data.roomCode].allPlayers), payload);
+      socket.emit("all-lobby-settings", 
+        [{
+          settingsName: "totalRounds", settingsVal: obj.totalRounds}, {
+          settingsName: "maxPlayers", settingsVal: obj.maxPlayers}, { 
+          settingsName: "drawTime", settingsVal: obj.drawTime
+        }]);
     });
 
     socket.on("settings", (payload) => {
@@ -55,11 +60,11 @@ app.prepare().then(() => {
       if (obj.currentDrawer !== socket.id)
       {
         if (
-          payload.message === obj.guessWord && 
+          payload.message.toLowerCase() === obj.guessWord.toLowerCase() && 
           obj.gamePhase === "draw-and-guess" && 
           obj.allPlayers[socket.id].hasCorrectlyGuessed === false
         ) {
-          obj.setPoints(payload.minutes, payload.seconds, "guesser", socket.id);
+          obj.setPoints("guesser", payload.minutes, payload.seconds, socket.id);
           io.to(socket.data.roomCode).emit("correct-guess", payload, socket.id, Object.values(obj.allPlayers));
         }
         else
@@ -90,6 +95,16 @@ app.prepare().then(() => {
         obj.guessWord = word;
 
       io.to(socket.data.roomCode).emit("overlay-dismiss", obj.guessWord.length);
+    });
+
+    socket.on("new-turn", () => {
+
+    });
+
+    socket.on("score-board", () => {
+      const obj = rooms[socket.data.roomCode];
+      obj.setPoints("drawer");
+      socket.emit("scores", Object.values(obj.allPlayers));
     });
 
   });

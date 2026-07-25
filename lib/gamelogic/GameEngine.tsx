@@ -22,7 +22,11 @@ export class GameEngine{
         return Math.round(basePoints + bonusPoints * timeRatio);
     };
 
-    public calculateDrawerPoints (correctGuessCount: number, totalGuessers: number) {
+    public calculateDrawerPoints () {
+        const totalGuessers = Object.keys(this.allPlayers).length;
+        const correctGuessCount = Object.values(this.allPlayers).reduce((count, p) => {
+            return p.hasCorrectlyGuessed === true ? count + 1: count
+        }, 0);
         if (totalGuessers === 0) return 0;
         const maxDrawerPoints = 100;
         return Math.round(maxDrawerPoints * (correctGuessCount / totalGuessers));
@@ -80,14 +84,16 @@ export class GameEngine{
         return res;
     };
 
-    public setPoints (minutes: number, seconds: number, role: "guesser" | "drawer", socketId: string) {
-        const time = (minutes * 60) + seconds;
-        if (role === "guesser") {
+    public setPoints (role: "guesser" | "drawer", minutes?: number, seconds?: number, socketId?: string) {
+        if (role === "guesser" && minutes && seconds && socketId) {
+            const time = (minutes * 60) + seconds;
             this.allPlayers[socketId].score += this.calcGueserPoints(time, this.drawTime);
             this.allPlayers[socketId].hasCorrectlyGuessed = true;
         }
-        else
-            this.allPlayers[socketId].score += this.calcGueserPoints(time, this.drawTime);
+        else if (role === "drawer") {
+            console.log(this.allPlayers);
+            this.allPlayers[this.currentDrawer].score += this.calculateDrawerPoints();
+        }
     };
 
     constructor(){
@@ -96,9 +102,9 @@ export class GameEngine{
         this.guessWord = "";
         this.currentDrawer = "";
         this.gamePhase = "lobby";
-        this.drawTime = 180;
-        this.totalRounds = 8;
-        this.maxPlayers = 16;
+        this.drawTime = 80;
+        this.totalRounds = 3;
+        this.maxPlayers = 8;
         this.currentRound = 1;
         this.turnOrder = [];
         this.allPlayers = {};
