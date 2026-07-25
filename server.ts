@@ -59,11 +59,14 @@ app.prepare().then(() => {
       const obj = rooms[socket.data.roomCode];
       if (obj.currentDrawer !== socket.id)
       {
+        console.log(payload.message.toLowerCase());
+        console.log(obj.guessWord.toLowerCase());
         if (
           payload.message.toLowerCase() === obj.guessWord.toLowerCase() && 
           obj.gamePhase === "draw-and-guess" && 
           obj.allPlayers[socket.id].hasCorrectlyGuessed === false
         ) {
+          console.log("reached");
           obj.setPoints("guesser", payload.minutes, payload.seconds, socket.id);
           io.to(socket.data.roomCode).emit("correct-guess", payload, socket.id, Object.values(obj.allPlayers));
         }

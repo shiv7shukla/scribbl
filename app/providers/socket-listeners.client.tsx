@@ -63,7 +63,7 @@ export function SocketListeners() {
     const onCorrectGuess = (payload: {id: string, sender: string, message: string}, sID: string, players: Player[]) => {
       if (store.getState().currPlayer.socketID !== sID)
         store.getState().actions.newMessage(payload);
-      store.getState().actions.markCorrectGuess(sID);
+      console.log(players);
       store.getState().actions.newPlayers(players);
     };
 

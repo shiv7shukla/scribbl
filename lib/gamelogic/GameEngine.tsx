@@ -85,14 +85,14 @@ export class GameEngine{
     };
 
     public setPoints (role: "guesser" | "drawer", minutes?: number, seconds?: number, socketId?: string) {
-        if (role === "guesser" && minutes && seconds && socketId) {
+        if (role === "guesser" && minutes !== undefined && seconds !== undefined && socketId !== undefined) {
             const time = (minutes * 60) + seconds;
             this.allPlayers[socketId].score += this.calcGueserPoints(time, this.drawTime);
             this.allPlayers[socketId].hasCorrectlyGuessed = true;
         }
         else if (role === "drawer") {
             console.log(this.allPlayers);
-            this.allPlayers[this.currentDrawer].score += this.calculateDrawerPoints();
+            this.allPlayers[this.currentDrawer].score = this.calculateDrawerPoints();
         }
     };
 

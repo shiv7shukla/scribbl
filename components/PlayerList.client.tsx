@@ -45,7 +45,7 @@ const PlayerList = () => {
         <ul className="flex flex-1 flex-col gap-2 overflow-y-auto">
             {players.map((player) => (
             <li
-                key={player.id}
+                key={player.socketID}
                 className={`flex items-center gap-3 rounded-lg border px-3 py-2.5
                 ${player.hasCorrectlyGuessed === true
                     ? "border-primary/30 bg-success text-success-foreground"
