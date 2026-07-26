@@ -1,7 +1,7 @@
 import next from "next";
 import { createServer } from "node:http";
 import { Server, type Socket } from "socket.io";
-import type { Player } from "./lib/types/types";
+import type { DrawEventPayload, Player } from "./lib/types/types";
 import { GameEngine } from "./lib/gamelogic/GameEngine";
 
 const dev = process.env.NODE_ENV !== "production";
@@ -101,13 +101,18 @@ app.prepare().then(() => {
     });
 
     socket.on("new-turn", () => {
-
     });
 
     socket.on("score-board", () => {
       const obj = rooms[socket.data.roomCode];
       obj.setPoints("drawer");
       socket.emit("scores", Object.values(obj.allPlayers));
+    });
+
+    socket.on("draw-event", (payload: DrawEventPayload) => {
+      const obj = rooms[socket.data.roomCode];
+      if (obj.allPlayers[socket.id].isDrawer)
+        socket.to(socket.data.roomCode).emit("draw-event", payload);
     });
 
   });

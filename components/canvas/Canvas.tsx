@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 import ToolBar from "./ToolBar";
 import { socket } from "@/app/socket";
 import { useGameStore } from "@/app/providers/game-store-provider";
+import { DrawEventPayload } from "@/lib/types/types";
 
 export default function Canvas() {
     const engineRef = useRef<DrawingEngine>(null);
@@ -38,20 +39,25 @@ export default function Canvas() {
 
         engineRef.current = new DrawingEngine(canvas, socket);
 
-        socket.on("draw-event", (payload) => {
-        switch (payload.type){
-            case "mousedown":
-                engineRef.current?.startDrawing(payload.x, payload.y);
-                break;
-            case "mousemove":
-                engineRef.current?.draw(payload.x, payload.y);
-                break;
-            case "mouseup":
-                engineRef.current?.stopDrawing();
-                break;
-            case "mouseout":
-                engineRef.current?.stopDrawing();
-                break;
+        socket.on("draw-event", (payload: DrawEventPayload) => {
+            console.log(payload);
+            switch (payload.type) {
+                case "mousedown":
+                    engineRef.current?.startDrawing(payload.x, payload.y);
+                    break;
+                case "mousemove":
+                    engineRef.current?.draw(payload.x, payload.y);
+                    break;
+                case "mouseup":
+                    engineRef.current?.stopDrawing();
+                case "mouseout":
+                    engineRef.current?.stopDrawing();
+                    break;
+                case "setbrush":
+                    engineRef.current?.setBrush(payload.color, payload.size);
+                    break;
+                case "clear":
+                    engineRef.current?.clear();
         }
     })
 

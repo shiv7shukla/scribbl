@@ -5,8 +5,6 @@ export class DrawingEngine {
     public canvas: HTMLCanvasElement;
     public ctx: CanvasRenderingContext2D | null;
     public isDrawing: boolean;
-    public lastX: number;
-    public lastY: number;
     public smoothBrush: SmoothBrush;
     public socket: Socket;
     public inputEnabled: boolean;
@@ -24,8 +22,6 @@ export class DrawingEngine {
         this.ctx = canvas.getContext("2d");
         this.isDrawing = false;
         this.inputEnabled = false;
-        this.lastX = 0;
-        this.lastY = 0;
         this.socket = socket;
         this.smoothBrush = new SmoothBrush(canvas);
 
@@ -51,24 +47,24 @@ export class DrawingEngine {
             if (!this.inputEnabled) return;
             const { x, y } = this.getCoordinates(e);
             this.startDrawing(x, y);
-            this.socket.emit("mousedown", {x, y});
+            this.socket.emit("draw-event", {type: "mousedown", x, y});
         }
         this.onMouseMove = (e) => {
             if (!this.inputEnabled) return;
             if (!this.isDrawing) return;
             const { x, y } = this.getCoordinates(e);
             this.draw(x, y);
-            this.socket.emit("mousemove", {x, y});
+            this.socket.emit("draw-event", {type: "mousemove", x, y});
         }
         this.onMouseUp = () => {
             if (!this.inputEnabled) return;
             this.stopDrawing();
-            this.socket.emit("mouseup");
+            this.socket.emit("draw-event", {type: "mouseup"});
         }
         this.onMouseOut = () => {
             if (!this.inputEnabled) return;
             this.stopDrawing();
-            this.socket.emit("mouseout");
+            this.socket.emit("draw-event", {type: "mouseout"});
         }
 
         // this.onTouchStart = (e) => {
@@ -116,8 +112,6 @@ export class DrawingEngine {
 
     startDrawing (x: number, y: number) {
         this.isDrawing = true;
-        this.lastX = x;
-        this.lastY = y;
 
         // Start a new path
         if (!this.ctx) return;

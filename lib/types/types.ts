@@ -14,6 +14,22 @@ export type LobbySettings = {
 	hints: number;
 };
 
+export type mouseEvents = "mousedown" | "mousemove" | "mouseup" | "mouseout" | "clear";
+
+export type MouseEventPayload = {
+	type: mouseEvents; 
+	x: number;
+	y: number;
+};
+
+export type BrushEventPayload = {
+	type: "setbrush";
+	color: string;
+	size: number;
+}
+
+export type DrawEventPayload = MouseEventPayload | BrushEventPayload;
+
 export type Player = { 
 	id: string,
 	username: string, 

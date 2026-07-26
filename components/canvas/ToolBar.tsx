@@ -1,26 +1,39 @@
 "use client";
+
 import React, { useState } from 'react'
 import { DrawingEngine } from '@/lib/drawingcanvas/DrawingEngine';
 import { Trash2 } from 'lucide-react';
+import { useGameStore } from '@/app/providers/game-store-provider';
+import { socket } from '@/app/socket';
+import { DrawEventPayload } from '@/lib/types/types';
 
 type ToolbarProps = {
     engineRef: React.RefObject<DrawingEngine | null>;
 };
 
 const ToolBar = ({ engineRef }: ToolbarProps) => {
+    const currPlayer = useGameStore((state) => state.currPlayer);
+
     const [color, setColor] = useState("#000000");
     const [size, setSize] = useState(3);
+
+    const sendBrushEvent = (payload: DrawEventPayload) => {
+        if (currPlayer.isDrawer) 
+            socket.emit("draw-event", payload);
+    }
 
     const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const nextColor = e.target.value;
         setColor(nextColor);
         engineRef.current?.setBrush(nextColor, size);
+        sendBrushEvent({type: "setbrush", color: nextColor, size});
     };
 
     const handleSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const nextSize = Number.parseInt(e.target.value, 10);
         setSize(nextSize);
         engineRef.current?.setBrush(color, nextSize);
+        sendBrushEvent({type: "setbrush", color, size: nextSize});
     };
 
     return (
@@ -41,7 +54,7 @@ const ToolBar = ({ engineRef }: ToolbarProps) => {
             />
             <button
                 type="button"
-                onClick={() => engineRef.current?.clear()}
+                onClick={() => {engineRef.current?.clear(); socket.emit("draw-event", {type: "clear"})}}
                 className="surface-btn flex size-10 items-center justify-center"
                 aria-label="Clear canvas"
             >
