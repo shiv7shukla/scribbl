@@ -1,9 +1,10 @@
 "use client";
 
 import { socket } from "@/app/socket";
-import type { Player } from "@/lib/types/types";
+import type { DrawEventPayload, Player } from "@/lib/types/types";
 import { useContext, useEffect } from "react";
 import { GameStoreContext } from "./game-store-provider";
+import { canvasStrokes } from "@/lib/utils";
 
 export function SocketListeners() {
   const store = useContext(GameStoreContext);
@@ -75,6 +76,11 @@ export function SocketListeners() {
       payload.map((p) => {
         store.getState().actions.applyRemoteSettings(p.settingsName, p.settingsVal);
       })
+    };
+
+    const replayForLateJoinee = (payload: DrawEventPayload []) => {
+      store.getState().actions.changeGamePhase();
+      store.getState().actions.setHistory(payload);
     }
 
     socket.on("new-joinee", onNewJoinee);
@@ -86,6 +92,7 @@ export function SocketListeners() {
     socket.on("correct-guess", onCorrectGuess);
     socket.on("scores", onScores);
     socket.on("all-lobby-settings", allSettings);
+    socket.on("replay-history", replayForLateJoinee);
     
 
     return () => {
@@ -98,6 +105,7 @@ export function SocketListeners() {
       socket.off("correct-guess", onCorrectGuess);
       socket.off("scores", onScores);
       socket.off("all-lobby-settings", allSettings);
+      socket.off("replay-history", replayForLateJoinee);
 
     };
   }, [store]);

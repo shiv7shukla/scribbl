@@ -48,6 +48,10 @@ app.prepare().then(() => {
           settingsName: "maxPlayers", settingsVal: obj.maxPlayers}, { 
           settingsName: "drawTime", settingsVal: obj.drawTime
         }]);
+      if (obj.gamePhase === "draw-and-guess") {
+        socket.emit("overlay-dismiss", obj.guessWord.length);
+        socket.emit("replay-history", obj.strokeHistory);
+      }
     });
 
     socket.on("settings", (payload) => {
@@ -111,8 +115,10 @@ app.prepare().then(() => {
 
     socket.on("draw-event", (payload: DrawEventPayload) => {
       const obj = rooms[socket.data.roomCode];
-      if (obj.allPlayers[socket.id].isDrawer)
+      if (obj.allPlayers[socket.id].isDrawer) {
         socket.to(socket.data.roomCode).emit("draw-event", payload);
+        obj.addToHistory(payload);
+      }
     });
 
   });

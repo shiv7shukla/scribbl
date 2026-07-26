@@ -1,3 +1,5 @@
+import type { DrawingEngine } from "../drawingcanvas/DrawingEngine";
+
 export type ChatMessage = {
 	id: string;
 	author: string;
@@ -53,6 +55,7 @@ export type sharedGameState = {
 	drawTime: number;
 	minutes: number;
 	seconds: number;
+	strokeHistory: DrawEventPayload [];      
 };
 
 export type gameOverlayState =
@@ -86,6 +89,7 @@ export type gameActions = {
 	setChoosingOverlay: (username: string) => void;
 	enterRoom: (payload: Player, admin: boolean) => void;
 	setCurrPlayer: (updatedFields: Partial<Player>) => void;
+	setHistory: (payload: DrawEventPayload []) => void;
 	newMessage: (newMsg: {id: string, sender: string, message: string}) => void;
 	applyRemoteSettings: (settingsName: string, settingsVal: string | number | boolean) => void;
 	// sendLobbySettings: (settingsName: Partial<LobbySettings>, settingsVal: string | number | boolean) => void;

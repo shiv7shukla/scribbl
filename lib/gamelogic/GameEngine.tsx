@@ -1,4 +1,4 @@
-import { Player } from "../types/types";
+import { DrawEventPayload, Player } from "../types/types";
 import { wordBank } from "../wordBank";
 
 export class GameEngine{
@@ -8,7 +8,7 @@ export class GameEngine{
     public currentDrawer: string;           
     public adminId: string;                 
     public guessWord: string;               
-    // public strokeHistory: DrawEvent[];      
+    public strokeHistory: DrawEventPayload [];      
     public gamePhase: "lobby" | "waiting" | "draw-and-guess" | "rounds-over";
     public currentRound: number;
     public totalRounds: number;
@@ -96,6 +96,10 @@ export class GameEngine{
         }
     };
 
+    public addToHistory (payload: DrawEventPayload) {
+        this.strokeHistory.push(payload);
+    }
+
     constructor(){
         this.roomCode = "";
         this.adminId = "";
@@ -107,6 +111,7 @@ export class GameEngine{
         this.maxPlayers = 8;
         this.currentRound = 1;
         this.turnOrder = [];
+        this.strokeHistory = [];
         this.allPlayers = {};
     }
 

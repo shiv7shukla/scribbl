@@ -1,4 +1,4 @@
-import { gameStore, privatePayload, sharedGameState } from "@/lib/types/types";
+import { gameStore, privatePayload, sharedGameState, type DrawEventPayload } from "@/lib/types/types";
 import { createStore } from "zustand";
 import { socket } from "../socket";
 
@@ -15,6 +15,7 @@ export const defaultInitState: sharedGameState & privatePayload = {
     overlay: { type: null },
     minutes: 0,
     seconds: 0,
+    strokeHistory: [],
     currPlayer: {
         id: "",
         username: "",
@@ -31,6 +32,7 @@ export const createGameStore = ( initState: sharedGameState & privatePayload = d
     return createStore<gameStore>()((set, get) => ({
         ...initState,
         actions: {
+            setHistory: (payload: DrawEventPayload []) => set((state) => ({strokeHistory: payload})),
             clearOverlay: () => set({ overlay: { type: null } }),
             incrementRound: () => set((state) => ({ currentRound: state.currentRound + 1 })),
             

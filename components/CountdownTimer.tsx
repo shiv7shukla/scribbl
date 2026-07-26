@@ -7,7 +7,7 @@ const CountdownTimer = () => {
     const { setTime, newTurn, scoreBoard } = useGameStore((state) => state.actions);
     const drawTime = useGameStore((state) => state.drawTime);
     const [ minutes, setMinutes ] = useState(Math.floor(drawTime / 60));
-    const [seconds, setSeconds ] =  useState(drawTime);
+    const [seconds, setSeconds ] =  useState(drawTime % 60);
 
     useEffect(() => {
         let myInterval = setInterval(() => {

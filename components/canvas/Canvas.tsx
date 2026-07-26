@@ -6,12 +6,18 @@ import ToolBar from "./ToolBar";
 import { socket } from "@/app/socket";
 import { useGameStore } from "@/app/providers/game-store-provider";
 import { DrawEventPayload } from "@/lib/types/types";
+import { canvasStrokes } from "@/lib/utils";
+import { useShallow } from "zustand/shallow";
 
 export default function Canvas() {
     const engineRef = useRef<DrawingEngine>(null);
     const divRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const currPlayer = useGameStore((state) => state.currPlayer);
+    const { currPlayer, strokeHistory } = useGameStore(useShallow((state) => ({ 
+        currPlayer: state.currPlayer,
+        strokeHistory: state.strokeHistory
+    })));
+    const  { setHistory } = useGameStore((state) => state.actions);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -39,27 +45,10 @@ export default function Canvas() {
 
         engineRef.current = new DrawingEngine(canvas, socket);
 
-        socket.on("draw-event", (payload: DrawEventPayload) => {
-            console.log(payload);
-            switch (payload.type) {
-                case "mousedown":
-                    engineRef.current?.startDrawing(payload.x, payload.y);
-                    break;
-                case "mousemove":
-                    engineRef.current?.draw(payload.x, payload.y);
-                    break;
-                case "mouseup":
-                    engineRef.current?.stopDrawing();
-                case "mouseout":
-                    engineRef.current?.stopDrawing();
-                    break;
-                case "setbrush":
-                    engineRef.current?.setBrush(payload.color, payload.size);
-                    break;
-                case "clear":
-                    engineRef.current?.clear();
-        }
-    })
+        if (strokeHistory)
+            strokeHistory.forEach((p) => canvasStrokes(p, engineRef));
+
+        socket.on("draw-event", (payload: DrawEventPayload) => canvasStrokes(payload, engineRef))
 
         return () => {
             engineRef.current?.destroy();
