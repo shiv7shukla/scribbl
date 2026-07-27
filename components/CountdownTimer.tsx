@@ -33,7 +33,8 @@ const CountdownTimer = () => {
     useEffect(() => {
         setTime("seconds", seconds);
         setTime("minutes", minutes);
-        if (seconds === 0 && minutes === 0) scoreBoard();
+        if (seconds === 0 && minutes === 0) 
+            scoreBoard();
     }, [seconds, minutes]);
 
     return (

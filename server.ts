@@ -11,36 +11,50 @@ const port = 3000;
 const app = next({ dev, hostname, port });
 const handler = app.getRequestHandler();
 
+
 export const rooms: Record<string, GameEngine> = {}; // roomCode => class object
 app.prepare().then(() => {
   const httpServer = createServer(handler);
   const io = new Server(httpServer, { transports: ["websocket"] });
+
   const createRoom = (roomCode: string, payload: Player) => {
     const obj = new GameEngine();
     rooms[roomCode] = obj;
     obj.roomCode = roomCode;
     obj.adminId = payload.socketID;
-    obj.allPlayers[payload.socketID] = payload;
-  }
+    obj.addPlayer(payload);
+  };
   const initializePayload = (payload: Player, socket: Socket, roomCode: string) => {
     socket.data.roomCode = roomCode;
     socket.join(roomCode);
     payload.socketID = socket.id;
     payload.id = crypto.randomUUID();
-  }
+  };
+  const gameStarter = (obj: GameEngine, socket: Socket) => {
+    obj.newPhase("waiting");
+    
+    const drawer = obj.newDrawer();
+    const words = obj.guessWords();
+          
+    socket.to(drawer).emit("choose-word", words, Object.values(obj.allPlayers)); // to the drawer
+    io.to(socket.data.roomCode).except(drawer).emit("is-choosing", Object.values(obj.allPlayers)); // to the guessers
+  };
 
   io.on("connection", (socket) => {
     socket.on("join-room", (roomCode, payload) => {
       payload.isAdmin = true;
+
       initializePayload(payload, socket, roomCode);
       createRoom(roomCode, payload);
+
       io.to(roomCode).emit("new-joinee", Object.values(rooms[socket.data.roomCode].allPlayers), payload);
     });
 
     socket.on("join-created-room", (roomCode, payload) => {
       initializePayload(payload, socket, roomCode);
+
       const obj = rooms[roomCode];
-      obj.allPlayers[payload.socketID] = payload;
+
       io.to(roomCode).emit("new-joinee", Object.values(rooms[socket.data.roomCode].allPlayers), payload);
       socket.emit("all-lobby-settings", 
         [{
@@ -48,6 +62,7 @@ app.prepare().then(() => {
           settingsName: "maxPlayers", settingsVal: obj.maxPlayers}, { 
           settingsName: "drawTime", settingsVal: obj.drawTime
         }]);
+
       if (obj.gamePhase === "draw-and-guess") {
         socket.emit("overlay-dismiss", obj.guessWord.length);
         socket.emit("replay-history", obj.strokeHistory);
@@ -70,7 +85,6 @@ app.prepare().then(() => {
           obj.gamePhase === "draw-and-guess" && 
           obj.allPlayers[socket.id].hasCorrectlyGuessed === false
         ) {
-          console.log("reached");
           obj.setPoints("guesser", payload.minutes, payload.seconds, socket.id);
           io.to(socket.data.roomCode).emit("correct-guess", payload, socket.id, Object.values(obj.allPlayers));
         }
@@ -81,17 +95,7 @@ app.prepare().then(() => {
 
     socket.on("start-game", () => {
       const obj = rooms[socket.data.roomCode];
-
-      obj.newPhase("waiting");
-      obj.formQueue();
-
-      const drawer = obj.newDrawer();
-      const words = obj.guessWords();
-
-      obj.allPlayers[drawer].isDrawer = true;
-
-      socket.to(drawer).emit("choose-word", words); // to the drawer
-      io.to(socket.data.roomCode).except(drawer).emit("is-choosing", obj.allPlayers[drawer], ); // to the guessers
+      gameStarter(obj, socket);
     });
 
     socket.on("word-chosen", (word: string) => {
@@ -110,7 +114,12 @@ app.prepare().then(() => {
     socket.on("score-board", () => {
       const obj = rooms[socket.data.roomCode];
       obj.setPoints("drawer");
+      obj.resetPLayers();
       socket.emit("scores", Object.values(obj.allPlayers));
+
+      setTimeout(() => {
+        gameStarter(obj, socket);
+      }, 5000);    
     });
 
     socket.on("draw-event", (payload: DrawEventPayload) => {

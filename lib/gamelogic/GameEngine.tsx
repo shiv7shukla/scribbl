@@ -3,7 +3,7 @@ import { wordBank } from "../wordBank";
 
 export class GameEngine{
     public roomCode: string;
-    public allPlayers: Record<string, Player>; // socketId => Payer Object
+    public allPlayers: Record<string, Player>; // socketId => Player Object
     public turnOrder: string [];             
     public currentDrawer: string;           
     public adminId: string;                 
@@ -62,8 +62,10 @@ export class GameEngine{
 
     public newDrawer (): string {
         const drawer = this.turnOrder.pop();
-        if (drawer)
+        if (drawer) {
             this.currentDrawer = drawer;
+            this.allPlayers[this.currentDrawer].isDrawer = true;
+        }
         return this.currentDrawer;
     };
 
@@ -91,13 +93,28 @@ export class GameEngine{
             this.allPlayers[socketId].hasCorrectlyGuessed = true;
         }
         else if (role === "drawer") {
-            console.log(this.allPlayers);
-            this.allPlayers[this.currentDrawer].score = this.calculateDrawerPoints();
+            this.allPlayers[this.currentDrawer].score += this.calculateDrawerPoints();
         }
     };
 
     public addToHistory (payload: DrawEventPayload) {
         this.strokeHistory.push(payload);
+    };
+
+    public resetPLayers () {
+        if (this.currentDrawer !== "")
+            this.allPlayers[this.currentDrawer].isDrawer = false;
+
+        const players = Object.fromEntries((Object.entries(this.allPlayers) as [string, Player] []).map(([k, v]) => {
+            return [k, {...v, hasCorrectlyGuessed: false}];
+        })) as Record<string, Player>;
+
+        this.allPlayers = players;
+    };
+
+    public addPlayer (player: Player) {
+        this.allPlayers[player.socketID] = player;
+        this.turnOrder.push(player.socketID);
     }
 
     constructor(){

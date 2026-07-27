@@ -73,10 +73,6 @@ export const createGameStore = ( initState: sharedGameState & privatePayload = d
                     socket.emit("join-created-room", get().roomCode, payload);
             },
 
-            // sendLobbySettings: (settingsName, settingsVal) => {
-            //     socket.emit("settings", {settingsName, settingsVal});
-            // },
-
             sendNewMessage: (payload: {id: string, sender: string, message: string, minutes: number, seconds: number}) => {
                 socket.emit("new-message", payload);
             },            
@@ -91,11 +87,14 @@ export const createGameStore = ( initState: sharedGameState & privatePayload = d
             },
 
             scoreBoard: () => {
-                socket.emit("score-board");
+                if (get().currPlayer.isDrawer)
+                    socket.emit("score-board");
                 set((state) => ({
                     overlay: { type: "score-board" },
-                    players: state.players.map((p) => p.hasCorrectlyGuessed === true ? { ...p, hasCorrectlyGuessed: false } : p )
-                }))
+                    players: state.players.map((p) => p.hasCorrectlyGuessed === true ? { ...p, hasCorrectlyGuessed: false, isDrawer: false } : p ),
+                    currPlayer: { ...state.currPlayer, isDrawer: false},
+                    guessWord: "",
+                }));
             },
         }
     }))
