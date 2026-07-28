@@ -89,12 +89,6 @@ export const createGameStore = ( initState: sharedGameState & privatePayload = d
             scoreBoard: () => {
                 if (get().currPlayer.isDrawer)
                     socket.emit("score-board");
-                set((state) => ({
-                    overlay: { type: "score-board" },
-                    players: state.players.map((p) => p.hasCorrectlyGuessed === true ? { ...p, hasCorrectlyGuessed: false, isDrawer: false } : p ),
-                    currPlayer: { ...state.currPlayer, isDrawer: false},
-                    guessWord: "",
-                }));
             },
         }
     }))

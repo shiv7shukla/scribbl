@@ -13,11 +13,11 @@ export default function Canvas() {
     const engineRef = useRef<DrawingEngine>(null);
     const divRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const { currPlayer, strokeHistory } = useGameStore(useShallow((state) => ({ 
+    const { currPlayer, strokeHistory, guessWord } = useGameStore(useShallow((state) => ({ 
         currPlayer: state.currPlayer,
-        strokeHistory: state.strokeHistory
+        strokeHistory: state.strokeHistory,
+        guessWord: state.guessWord
     })));
-    const  { setHistory } = useGameStore((state) => state.actions);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -59,7 +59,13 @@ export default function Canvas() {
 
     useEffect(() => {
         engineRef.current?.invertInputEnabled(currPlayer.isDrawer);
-    }, [currPlayer.isDrawer]);
+        engineRef.current?.clear();
+        engineRef.current?.setBrush("#000000", 3);
+    }, [currPlayer.isDrawer, guessWord]);
+
+    // useEffect(() => {
+    //     engineRef.current?.clear();
+    // }, [guessWord]);
 
     return (
         <div className="h-full w-full">

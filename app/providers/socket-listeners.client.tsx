@@ -4,7 +4,6 @@ import { socket } from "@/app/socket";
 import type { DrawEventPayload, Player } from "@/lib/types/types";
 import { useContext, useEffect } from "react";
 import { GameStoreContext } from "./game-store-provider";
-import { canvasStrokes } from "@/lib/utils";
 
 export function SocketListeners() {
   const store = useContext(GameStoreContext);
@@ -18,7 +17,6 @@ export function SocketListeners() {
     })
 
     const onNewJoinee = (players: Player[], payload: Player) => {
-      console.log(players);
       const { newPlayers, newMessage, setCurrPlayer } = store.getState().actions;
       setCurrPlayer({ socketID: socket.id });
       newMessage({
@@ -65,12 +63,17 @@ export function SocketListeners() {
     const onCorrectGuess = (payload: {id: string, sender: string, message: string}, sID: string, players: Player[]) => {
       if (store.getState().currPlayer.socketID !== sID)
         store.getState().actions.newMessage(payload);
-      console.log(players);
       store.getState().actions.newPlayers(players);
     };
 
     const onScores = (players: Player[]) => {
       store.getState().actions.newPlayers(players);
+      store.setState((state) => ({ 
+        overlay: { type: "score-board" },
+        guessWord: "",
+        currPlayer: { ...state.currPlayer, isDrawer: false, hasCorrectlyGuessed: false}
+       }));
+      console.log("reached scores");
     };
 
     const allSettings = (payload: [{settingsName: string, settingsVal: string | number}]) => {

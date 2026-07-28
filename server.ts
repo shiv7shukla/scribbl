@@ -54,8 +54,9 @@ app.prepare().then(() => {
       initializePayload(payload, socket, roomCode);
 
       const obj = rooms[roomCode];
+      obj.addPlayer(payload);
 
-      io.to(roomCode).emit("new-joinee", Object.values(rooms[socket.data.roomCode].allPlayers), payload);
+      io.to(roomCode).emit("new-joinee", Object.values(obj.allPlayers), payload);
       socket.emit("all-lobby-settings", 
         [{
           settingsName: "totalRounds", settingsVal: obj.totalRounds}, {
@@ -78,8 +79,6 @@ app.prepare().then(() => {
       const obj = rooms[socket.data.roomCode];
       if (obj.currentDrawer !== socket.id)
       {
-        console.log(payload.message.toLowerCase());
-        console.log(obj.guessWord.toLowerCase());
         if (
           payload.message.toLowerCase() === obj.guessWord.toLowerCase() && 
           obj.gamePhase === "draw-and-guess" && 
@@ -115,7 +114,8 @@ app.prepare().then(() => {
       const obj = rooms[socket.data.roomCode];
       obj.setPoints("drawer");
       obj.resetPLayers();
-      socket.emit("scores", Object.values(obj.allPlayers));
+      io.to(socket.data.roomCode).emit("scores", Object.values(obj.allPlayers));
+      // socket.emit("scores", Object.values(obj.allPlayers));
 
       setTimeout(() => {
         gameStarter(obj, socket);

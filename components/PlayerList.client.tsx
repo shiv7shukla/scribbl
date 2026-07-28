@@ -31,7 +31,7 @@ const PlayerList = () => {
         currPlayer: state.currPlayer,
         drawTime: state.drawTime,
        })));
-    console.log(players);
+       
     return (
     <aside className="surface-card-lg flex h-full flex-col p-4">
         <div className="mb-4 flex items-center gap-2 border-b border-border/60 pb-3">

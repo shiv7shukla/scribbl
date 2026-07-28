@@ -42,10 +42,10 @@ export default function GameOverlay() {
     if (overlay.type === "waiting" && secondsLeft === 0 && !hasSubmitted.current) {
       hasSubmitted.current = true;
       submitWordChoice(overlay.words[0]);
-  }
-  else if (overlay.type === "score-board" && secondsLeft === 0)
-    clearOverlay();
-}, [secondsLeft, overlay.type, submitWordChoice]);
+    }
+    else if (overlay.type === "score-board" && secondsLeft === 0)
+      clearOverlay();
+  }, [secondsLeft, overlay.type, submitWordChoice]);
 
   if (overlay.type === null) return null;
 
