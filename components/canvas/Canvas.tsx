@@ -63,8 +63,10 @@ export default function Canvas() {
             engineRef.current?.invertInputEnabled(currPlayer.isDrawer);
             engineRef.current?.clear();
             engineRef.current?.setBrush("#000000", 3);
+        } else {
+            engineRef.current?.invertInputEnabled(currPlayer.isDrawer);
         }
-    }, [overlay.type]);
+    }, [overlay.type, currPlayer.isDrawer]);
 
     return (
         <div className="h-full w-full">

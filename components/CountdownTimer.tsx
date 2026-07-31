@@ -7,17 +7,23 @@ import { useShallow } from 'zustand/shallow';
 const CountdownTimer = memo(function CountdownTimer() {
     const { setTime, scoreBoard } = useGameStore((state) => state.actions);
     const { turnEndsAt, clockOffSet } = useGameStore(useShallow((state) => ({ turnEndsAt: state.turnEndsAt, clockOffSet: state.clockOffSet})));
-    const [remaining, setRemaining] = useState(() => Math.max(0, turnEndsAt - Date.now()));
+    const [remaining, setRemaining] = useState(() => Math.max(0, turnEndsAt - (Date.now() + clockOffSet)));
 
   useEffect(() => {
+    if (turnEndsAt <= 0) {
+      setRemaining(0);
+      return;
+    }
+
     const initial = Math.max(0, turnEndsAt - (Date.now() + clockOffSet));
     setRemaining(initial);
 
     const interval = setInterval(() => {
       const rem = Math.max(0, turnEndsAt - (Date.now() + clockOffSet));
       setRemaining(rem);
-      setTime("minutes", minutes);
-      setTime("seconds", seconds);
+      const totalSeconds = Math.ceil(rem / 1000);
+      setTime("minutes", Math.floor(totalSeconds / 60));
+      setTime("seconds", totalSeconds % 60);
       if (rem <= 0) {
         clearInterval(interval);
         scoreBoard();
@@ -25,7 +31,7 @@ const CountdownTimer = memo(function CountdownTimer() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [turnEndsAt]);
+  }, [turnEndsAt, clockOffSet, setTime, scoreBoard]);
 
   const totalSeconds = Math.ceil(remaining / 1000);
   const minutes = Math.floor(totalSeconds / 60);

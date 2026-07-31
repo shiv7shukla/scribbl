@@ -38,28 +38,47 @@ export function SocketListeners() {
       store.getState().actions.newMessage(payload);
     }
 
+    const onWaiting = (words: string[], players: Player []) => {
+      store.getState().actions.changeGamePhase();
+      const me = players.find((p) => p.socketID === socket.id);
+      store.setState({
+        overlay: { type: "waiting", words },
+        players,
+        currPlayer: me
+          ? { ...store.getState().currPlayer, ...me, isDrawer: true }
+          : { ...store.getState().currPlayer, isDrawer: true },
+        turnEndsAt: 0,
+        guessWord: "",
+        strokeHistory: [],
+      });
+    };
+
     const onIsChoosing = (players: Player []) => {
       store.getState().actions.changeGamePhase();
       const player = players.find((p) => p.isDrawer === true);
-      if (player)
-        store.getState().actions.setChoosingOverlay(player.username);
-      store.getState().actions.newPlayers(players);
+      const me = players.find((p) => p.socketID === socket.id);
+      store.setState({
+        players,
+        turnEndsAt: 0,
+        guessWord: "",
+        overlay: player
+          ? { type: "is-choosing", username: player.username }
+          : { type: null },
+        currPlayer: me
+          ? { ...store.getState().currPlayer, ...me, isDrawer: false }
+          : { ...store.getState().currPlayer, isDrawer: false },
+      });
     };
 
-    const onWaiting = (words: string[], players: Player []) => {
-      store.getState().actions.changeGamePhase();
-      store.getState().actions.setWaitingOverlay(words);
-      store.getState().actions.setCurrPlayer({ isDrawer: true });
-      store.getState().actions.newPlayers(players);
-    };
-
-    const onOverlayDismiss = (blanks: number, currTime: number, serverNow: number) => {
+    const onOverlayDismiss = (blanks: number, currTime?: number, serverNow?: number) => {
       store.getState().actions.clearOverlay();
-      store.getState().actions.setClockOffset(serverNow - Date.now());
-      store.getState().actions.setTurnEndsAt(currTime);
-      if (!store.getState().currPlayer.isDrawer)
-        for (let i = 1; i <= blanks; i += 1)
-          store.getState().guessWord += "_ ";
+      if (currTime !== undefined && serverNow !== undefined) {
+        store.getState().actions.setClockOffset(serverNow - Date.now());
+        store.getState().actions.setTurnEndsAt(currTime);
+      }
+      if (!store.getState().currPlayer.isDrawer && blanks > 0) {
+        store.setState({ guessWord: "_ ".repeat(blanks) });
+      }
     };
 
     const onCorrectGuess = (payload: {id: string, sender: string, message: string}, sID: string, players: Player[]) => {
@@ -70,23 +89,31 @@ export function SocketListeners() {
     };
 
     const onScores = (players: Player[]) => {
-      store.getState().actions.newPlayers(players);
-      store.setState((state) => ({ 
+      const self = store.getState().currPlayer;
+      const me = players.find((p) => p.socketID === self.socketID);
+
+      store.setState({
+        players,
         overlay: { type: "score-board" },
         guessWord: "",
-        currPlayer: { ...state.currPlayer, isDrawer: false, hasCorrectlyGuessed: false}
-       }));
+        turnEndsAt: 0,
+        strokeHistory: [],
+        currPlayer: me
+          ? { ...self, score: me.score, isDrawer: false, hasCorrectlyGuessed: false }
+          : { ...self, isDrawer: false, hasCorrectlyGuessed: false },
+      });
     };
 
-    const allSettings = (payload: [{settingsName: string, settingsVal: string | number}]) => {
-      payload.map((p) => {
+    const allSettings = (payload: [{settingsName: string, settingsVal: string | number}], currentRound?: number) => {
+      payload.forEach((p) => {
         store.getState().actions.applyRemoteSettings(p.settingsName, p.settingsVal);
-      })
+      });
+      if (currentRound !== undefined) {
+        store.setState({ currentRound });
+      }
     };
 
     const replayForLateJoinee = (payload: DrawEventPayload [], turnEndsAt: number, serverNow: number) => {
-      console.log(payload.length);
-      console.log("replay reached");
       const clockOffset = serverNow - Date.now();
       store.getState().actions.setClockOffset(clockOffset);
       store.getState().actions.setTurnEndsAt(turnEndsAt);

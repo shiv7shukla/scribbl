@@ -15,6 +15,8 @@ export class GameEngine{
     public drawTime: number;                
     public maxPlayers: number;
     public turnEndsAt: number;
+    public wordChoices: string[];
+    public isScoring: boolean;
 
     public calcGueserPoints (timeRemaining: number, drawTime: number) {
         const basePoints = 50;
@@ -156,6 +158,8 @@ export class GameEngine{
         this.turnOrder = [];
         this.strokeHistory = [];
         this.allPlayers = {};
+        this.wordChoices = [];
+        this.isScoring = false;
     }
 
 }

@@ -11,7 +11,16 @@ const port = 3000;
 const app = next({ dev, hostname, port });
 const handler = app.getRequestHandler();
 
-export const rooms: Record<string, GameEngine> = {}; // roomCode => class object
+const rooms: Record<string, GameEngine> = {}; // roomCode => class object
+const turnTimers: Record<string, ReturnType<typeof setTimeout>> = {};
+
+const clearTurnTimer = (roomCode: string) => {
+  const timer = turnTimers[roomCode];
+  if (timer) {
+    clearTimeout(timer);
+    delete turnTimers[roomCode];
+  }
+};
 
 app.prepare().then(() => {
   const httpServer = createServer(handler);
@@ -30,18 +39,77 @@ app.prepare().then(() => {
     payload.socketID = socket.id;
     payload.id = crypto.randomUUID();
   };
-  const gameStarter = (obj: GameEngine, socket: Socket) => {
+  const gameStarter = (obj: GameEngine, roomCode: string) => {
     obj.newPhase("waiting");
+    obj.isScoring = false;
 
     const drawer = obj.newDrawer();
+    if (!drawer) return;
+
     const words = obj.guessWords();
+    obj.wordChoices = words;
     
-    io.to(drawer).emit("choose-word", words, Object.values(obj.allPlayers)); // to the drawer
-    io.to(socket.data.roomCode).except(drawer).emit("is-choosing", Object.values(obj.allPlayers)); // to the guessers
+    io.to(drawer).emit("choose-word", words, Object.values(obj.allPlayers));
+    io.to(roomCode).except(drawer).emit("is-choosing", Object.values(obj.allPlayers));
+  };
+
+  const handleTurnEnd = (roomCode: string) => {
+    clearTurnTimer(roomCode);
+    const obj = rooms[roomCode];
+    if (!obj || obj.gamePhase !== "draw-and-guess" || obj.isScoring) return;
+
+    obj.isScoring = true;
+    obj.setPoints("drawer");
+    obj.resetPLayers();
+
+    io.to(roomCode).emit("scores", Object.values(obj.allPlayers));
+
+    if (obj.turnOrder.length === 0 && obj.currentRound === obj.totalRounds) {
+      obj.gamePhase = "rounds-over";
+      io.to(roomCode).emit("game-over", Object.values(obj.allPlayers));
+      return;
+    }
+
+    if (obj.turnOrder.length === 0)
+      io.to(roomCode).emit("new-round");
+
+    setTimeout(() => {
+      gameStarter(obj, roomCode);
+    }, 5000);
+  };
+
+  const scheduleTurnEnd = (roomCode: string, drawTimeMs: number) => {
+    clearTurnTimer(roomCode);
+    turnTimers[roomCode] = setTimeout(() => handleTurnEnd(roomCode), drawTimeMs);
+  };
+
+  const syncLateJoiner = (socket: Socket, obj: GameEngine) => {
+    socket.emit("all-lobby-settings", 
+      [{
+        settingsName: "totalRounds", settingsVal: obj.totalRounds}, {
+        settingsName: "maxPlayers", settingsVal: obj.maxPlayers}, { 
+        settingsName: "drawTime", settingsVal: obj.drawTime
+      }], obj.currentRound);
+
+    if (obj.gamePhase === "waiting") {
+      if (socket.id === obj.currentDrawer) {
+        socket.emit("choose-word", obj.wordChoices, Object.values(obj.allPlayers));
+      } else {
+        socket.emit("is-choosing", Object.values(obj.allPlayers));
+      }
+      return;
+    }
+
+    if (obj.gamePhase === "draw-and-guess") {
+      socket.emit("overlay-dismiss", obj.guessWord.length, obj.turnEndsAt, Date.now());
+      socket.emit("replay-history", obj.strokeHistory, obj.turnEndsAt, Date.now());
+    }
   };
 
   io.on("connection", (socket) => {
     socket.on("join-room", (roomCode, payload) => {
+      if (roomCode in rooms) return;
+
       payload.isAdmin = true;
 
       initializePayload(payload, socket, roomCode);
@@ -52,28 +120,15 @@ app.prepare().then(() => {
 
     socket.on("join-created-room", (roomCode, payload) => {
       const obj = rooms[roomCode];
-      
+      if (!obj) return;
+
       if (Object.keys(obj.allPlayers).length >= obj.maxPlayers) return;
       initializePayload(payload, socket, roomCode);
 
       obj.addPlayer(payload);
 
       io.to(roomCode).emit("new-joinee", Object.values(obj.allPlayers), payload);
-      socket.emit("all-lobby-settings", 
-        [{
-          settingsName: "totalRounds", settingsVal: obj.totalRounds}, {
-          settingsName: "maxPlayers", settingsVal: obj.maxPlayers}, { 
-          settingsName: "drawTime", settingsVal: obj.drawTime
-        }]);
-
-      // if (obj.gamePhase === "draw-and-guess" || obj.gamePhase === "waiting")
-      //   socket.emit("sync-turn", obj.turnEndsAt, Date.now());
-
-      if (obj.gamePhase === "draw-and-guess") {
-        console.log(obj.strokeHistory.length);
-        socket.emit("overlay-dismiss", obj.guessWord.length);
-        socket.emit("replay-history", obj.strokeHistory, obj.turnEndsAt, Date.now());
-      }
+      syncLateJoiner(socket, obj);
     });
 
     socket.on("settings", (payload) => {
@@ -102,44 +157,32 @@ app.prepare().then(() => {
 
     socket.on("start-game", () => {
       const obj = rooms[socket.data.roomCode];
+      if (!obj) return;
 
-      gameStarter(obj, socket);
+      gameStarter(obj, socket.data.roomCode);
     });
 
     socket.on("word-chosen", (word: string) => {
       const obj = rooms[socket.data.roomCode];
+      if (!obj || socket.id !== obj.currentDrawer || obj.gamePhase !== "waiting") return;
+
       obj.newPhase("draw-and-guess");
 
-      if (word)
+      if (word) {
         obj.guessWord = word;
+      }
 
       obj.turnEndsAt = (obj.drawTime * 1000) + Date.now();
+      scheduleTurnEnd(socket.data.roomCode, obj.drawTime * 1000);
 
       io.to(socket.data.roomCode).emit("overlay-dismiss", obj.guessWord.length, obj.turnEndsAt, Date.now());
     });
 
-    socket.on("new-turn", () => {
-    });
-
     socket.on("score-board", () => {
       const obj = rooms[socket.data.roomCode];
+      if (!obj || socket.id !== obj.currentDrawer || obj.gamePhase !== "draw-and-guess") return;
 
-      obj.setPoints("drawer");
-      obj.resetPLayers();
-
-      io.to(socket.data.roomCode).emit("scores", Object.values(obj.allPlayers));
-
-      if (obj.turnOrder.length === 0 && obj.currentRound === obj.totalRounds) {
-        obj.gamePhase = "rounds-over";
-        io.to(socket.data.roomCode).emit("game-over", Object.values(obj.allPlayers));
-        return;
-      }
-
-      if (obj.turnOrder.length === 0)
-        io.to(socket.data.roomCode).emit("new-round");
-      setTimeout(() => {
-        gameStarter(obj, socket);
-      }, 5000);         
+      handleTurnEnd(socket.data.roomCode);
     });
 
     socket.on("draw-event", (payload: DrawEventPayload) => {

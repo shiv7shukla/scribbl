@@ -7,6 +7,7 @@ import { useShallow } from "zustand/shallow";
 import Confetti from "../Confetti";
 
 const CHOICE_SECONDS = 15;
+const SCOREBOARD_SECONDS = 5;
 
 const GameOverlay = memo(function GameOverlay() {
   const { submitWordChoice, clearOverlay } = useGameStore((state) => state.actions);
@@ -24,29 +25,42 @@ const GameOverlay = memo(function GameOverlay() {
     if (overlay.type !== "waiting") return;
 
     hasSubmitted.current = false;
-    setSecondsLeft(CHOICE_SECONDS);
+    let seconds = CHOICE_SECONDS;
+    setSecondsLeft(seconds);
+    const words = overlay.words;
 
     const interval = setInterval(() => {
-      setSecondsLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          return 0;
+      seconds -= 1;
+      setSecondsLeft(seconds);
+      if (seconds <= 0) {
+        clearInterval(interval);
+        if (!hasSubmitted.current) {
+          hasSubmitted.current = true;
+          submitWordChoice(words[0]);
         }
-        return prev - 1;
-      });
+      }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [overlay.type]);
+  }, [overlay.type, overlay.type === "waiting" ? overlay.words.join("|") : "", submitWordChoice]);
 
   useEffect(() => {
-    if (overlay.type === "waiting" && secondsLeft === 0 && !hasSubmitted.current) {
-      hasSubmitted.current = true;
-      submitWordChoice(overlay.words[0]);
-    }
-    else if (overlay.type === "score-board" && secondsLeft === 0)
-      clearOverlay();
-  }, [secondsLeft, overlay.type, submitWordChoice]);
+    if (overlay.type !== "score-board") return;
+
+    let seconds = SCOREBOARD_SECONDS;
+    setSecondsLeft(seconds);
+
+    const interval = setInterval(() => {
+      seconds -= 1;
+      setSecondsLeft(seconds);
+      if (seconds <= 0) {
+        clearInterval(interval);
+        clearOverlay();
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [overlay.type, clearOverlay]);
 
   if (overlay.type === null) return null;
 
