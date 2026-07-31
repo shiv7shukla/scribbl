@@ -3,18 +3,16 @@ import React, { useMemo } from 'react'
 import LobbySettingsControl from './LobbySettingsControl.client';
 import { Copy } from 'lucide-react';
 import { toast } from 'sonner';
+import { useGameStore } from '@/app/providers/game-store-provider';
+import { useShallow } from 'zustand/shallow';
 
 const LobbySettingsPanel = ({
-  roomCode,
   settings,
   isHost,
-  players,
   onSettingsChange,
 }: {
-  roomCode: string;
   settings: LobbySettings;
   isHost: boolean;
-  players: Player[];
   onSettingsChange: (patch: Partial<LobbySettings>) => void;
 }) => {
   const customWordCount = useMemo(
@@ -35,23 +33,49 @@ const LobbySettingsPanel = ({
     }
   }
 
+  const { 
+    totalRounds, 
+    maxPlayers, 
+    players,
+    drawTime,
+    roomCode,
+  } = useGameStore(useShallow((state) => ({
+    totalRounds: state.totalRounds, 
+    maxPlayers: state.maxPlayers, 
+    players: state.players,
+    drawTime: state.drawTime,
+    roomCode: state.roomCode,
+    currPlayer: state.currPlayer
+  })));
+  const {
+    setDrawTime, 
+    setTotalRounds, 
+    setMaxPlayers,
+    startGame,
+    changeGamePhase
+  } = useGameStore((state) => ( state.actions ));
+  const gameStart = () => {
+    changeGamePhase();
+    startGame();
+  }
+
   return (
-    <section className="pop-card-lg flex h-full flex-col bg-paper p-6">
+    <section className="surface-card-lg flex h-full flex-col p-6">
       <div className="mb-5 text-center">
-        <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+        <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
           Room lobby
         </p>
         <h1 className="font-display text-3xl">{roomCode || "—"}</h1>
         <div className="mt-2 flex items-center justify-center gap-2">
-          <p className="text-sm font-bold text-muted-foreground">
-            {players.length}/{settings.maxPlayers} players ·{" "}
+          <p className="text-sm text-muted-foreground">
+            {players.length}/{maxPlayers} players ·{" "}
           </p>
           <button
             type="button"
             onClick={copyRoomCode}
-            className="pop-btn pop-press inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-bold"
+            className="surface-btn inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium cursor-pointer"
           >
-            <Copy className="size-3.5" />
+            <Copy className="size-3.5 " />
             Copy
           </button>
         </div>
@@ -60,24 +84,24 @@ const LobbySettingsPanel = ({
       <div className="grid flex-1 content-start gap-3 sm:grid-cols-2">
         <LobbySettingsControl
           label="Rounds"
-          value={settings.rounds}
+          value={totalRounds}
           options={[2, 3, 4, 5, 6, 8]}
           disabled={!isHost}
-          onChange={(rounds) => onSettingsChange({ rounds })}
+          onChange={(totalRounds) => setTotalRounds( totalRounds )}
         />
         <LobbySettingsControl
           label="Draw time (s)"
-          value={settings.drawTime}
+          value={drawTime}
           options={[40, 60, 80, 100, 120, 150]}
           disabled={!isHost}
-          onChange={(drawTime) => onSettingsChange({ drawTime })}
+          onChange={(drawTime) => setDrawTime( drawTime )}
         />
         <LobbySettingsControl
           label="Max players"
-          value={settings.maxPlayers}
+          value={maxPlayers}
           options={[4, 6, 8, 10, 12]}
           disabled={!isHost}
-          onChange={(maxPlayers) => onSettingsChange({ maxPlayers })}
+          onChange={(maxPlayers) => setMaxPlayers( maxPlayers )}
         />
         <LobbySettingsControl
           label="Hints"
@@ -87,12 +111,12 @@ const LobbySettingsPanel = ({
           onChange={(hints) => onSettingsChange({ hints })}
         />
 
-        <div className="pop-card bg-card p-3 sm:col-span-2">
+        <div className="surface-card p-3 sm:col-span-2">
           <div className="mb-2 flex items-center justify-between">
-            <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Custom words (comma separated)
             </label>
-            <label className="flex cursor-pointer items-center gap-1.5 text-xs font-bold">
+            <label className="flex cursor-pointer items-center gap-1.5 text-xs font-medium">
               <input
                 type="checkbox"
                 checked={settings.useCustomWordsOnly}
@@ -111,7 +135,7 @@ const LobbySettingsPanel = ({
             onChange={(e) => onSettingsChange({ customWords: e.target.value })}
             rows={3}
             placeholder="cat, banana, lighthouse, etc."
-            className="w-full resize-none rounded-md border-2 border-border bg-input px-3 py-2 text-sm font-bold disabled:opacity-50"
+            className="w-full resize-none rounded-lg border border-border bg-input px-3 py-2 text-sm disabled:opacity-50"
           />
           <p className="mt-1 text-xs text-muted-foreground">
             {customWordCount} custom word{customWordCount === 1 ? "" : "s"}
@@ -125,10 +149,10 @@ const LobbySettingsPanel = ({
             <button
               type="button"
               disabled={players.length < 2}
-              onClick={() => toast.success("Game would start here!")}
-              className="pop-btn-primary pop-press px-8 py-4 font-display text-2xl disabled:opacity-50"
+              onClick={gameStart}
+              className={`surface-btn-primary px-8 py-3 text-lg font-medium disabled:opacity-50 ${players.find(p => p.isAdmin === true)? "visible" : "hidden"}`}
             >
-              ▶ Start Game
+              Start Game
             </button>
             {players.length < 2 && (
               <p className="mt-2 text-sm text-muted-foreground">
@@ -137,7 +161,7 @@ const LobbySettingsPanel = ({
             )}
           </>
         ) : (
-          <p className="font-display text-lg text-muted-foreground">
+          <p className="text-lg text-muted-foreground">
             Waiting for host to start...
           </p>
         )}

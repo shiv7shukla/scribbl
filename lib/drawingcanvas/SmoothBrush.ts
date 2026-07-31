@@ -15,13 +15,10 @@ export class SmoothBrush{
         this.points.push({x, y});
         
         // Keep only recent points for smoothing
-        if (this.points.length > 5) {
-            this.points.shift();
-        }
+        if (this.points.length > 5) this.points.shift();
         
-        if (this.points.length >= 3) {
-            this.drawSmoothedLine();
-        }
+        if (this.points.length >= 3) this.drawSmoothedLine();
+        
         // else if (this.points.length === 2 && this.ctx) {
         //    this.ctx.beginPath();
         //    this.ctx.moveTo(this.points[0].x, this.points[0].y);

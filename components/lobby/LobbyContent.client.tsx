@@ -2,23 +2,16 @@
 
 import { Toaster } from "@/components/ui/sonner";
 import {
-  Copy,
-  Crown,
-  Globe,
   Home,
-  Lock,
-  Send,
-  Users,
 } from "lucide-react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { useMemo, useState } from "react";
-import { toast } from "sonner";
-import LobbyChatPanel from "./LobbyChatPanel.client";
-import { Player, ChatMessage, LobbySettings } from "@/lib/types/types";
-import LobbyPlayerList from "./LobbyPlayerList.client";
+import { useState } from "react";
+import ChatPanel from "../ChatPanel.client";
+import { LobbySettings } from "@/lib/types/types";
+import LobbyPlayerList from "../PlayerList.client";
 import LobbySettingsPanel from "./LobbySettingsPanel.client";
-
+import { useGameStore } from "@/app/providers/game-store-provider";
+import { useShallow } from "zustand/shallow";
 
 const PLAYER_COLORS = [
         "#e74c3c",
@@ -35,44 +28,39 @@ const PLAYER_COLORS = [
         "#d35400",
         ];
 
-const MOCK_PLAYERS: Player[] = [
-  { id: "2", name: "SketchySam", color: PLAYER_COLORS[1], isHost: false, score: 0 },
-  { id: "3", name: "DoodleDan", color: PLAYER_COLORS[2], isHost: false, score: 0 },
-];
-
 export default function LobbyContent() {
-  const searchParams = useSearchParams();
-  const roomCode = searchParams.get("roomCode") ?? "ABC123";
   const [settings, setSettings] = useState<LobbySettings>({
-    rounds: 3,
+    totalRounds: 3,
     drawTime: 80,
     maxPlayers: 8,
     customWords: "",
     useCustomWordsOnly: false,
     hints: 2,
   });
-  const myName = searchParams.get("name") ?? "Guest";
-      const me: Player = useMemo(
-          () => ({
-              id: "me",
-              name: myName,
-              color: PLAYER_COLORS[0],
-              isHost: true,
-              score: 0,
-          }),
-          [myName],
-    );
-  
-  const players = useMemo(() => [me, ...MOCK_PLAYERS], [me]);
+  const {
+    totalRounds, 
+    maxPlayers, 
+    players,
+    currPlayer,
+    drawTime,
+    roomCode,
+    } = useGameStore(useShallow((state) => ({
+      totalRounds: state.totalRounds, 
+      maxPlayers: state.maxPlayers, 
+      players: state.players,
+      drawTime: state.drawTime,
+      roomCode: state.roomCode,
+      currPlayer: state.currPlayer
+    })));
 
   return (
     <div className="min-h-screen bg-background">
       <Toaster position="top-center" />
-      <header className="border-b-2 border-border/60 bg-card/80 backdrop-blur-sm h-17">
+      <header className="border-b border-border/60 bg-card/80 backdrop-blur-sm">
         <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-4 px-4 py-3">
           <Link
             href="/"
-            className="pop-btn pop-press inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold"
+            className="surface-btn inline-flex items-center gap-2 px-3 py-2 text-sm font-medium"
           >
             <Home className="size-4" />
             Home
@@ -83,31 +71,25 @@ export default function LobbyContent() {
           </div>
           <div className="w-[88px]" aria-hidden />
         </div>
-      </header>
+      </header> 
 
       <main className="mx-auto grid max-w-[1600px] gap-4 p-4 lg:grid-cols-[minmax(220px,280px)_1fr_minmax(240px,320px)] lg:items-start lg:gap-5 lg:p-5">
         <div className="order-2 lg:order-1 lg:min-h-[calc(100vh-5.5rem)]">
-          <LobbyPlayerList
-             players={players.slice(0, settings.maxPlayers)}
-            maxPlayers={settings.maxPlayers}
-            meId={me.id}
-          />
+          <LobbyPlayerList />
         </div>
 
         <div className="order-1 lg:order-2 lg:min-h-[calc(100vh-5.5rem)]">
           <LobbySettingsPanel
-            roomCode={roomCode}
             settings={settings}
-            isHost={me.isHost}
-            players={players}
+            isHost={currPlayer.isAdmin}
             onSettingsChange={(patch) =>
-              setSettings((prev) => ({ ...prev, ...patch }))
+            setSettings((prev) => ({ ...prev, ...patch }))
             }
           />
         </div>
 
         <div className="order-3 lg:min-h-[calc(100vh-5.5rem)]">
-          <LobbyChatPanel players={players} />
+          <ChatPanel players={players} />
         </div>
       </main>
     </div>

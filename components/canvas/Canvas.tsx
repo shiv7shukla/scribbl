@@ -3,13 +3,21 @@
 import { DrawingEngine } from "@/lib/drawingcanvas/DrawingEngine";
 import { useEffect, useRef } from "react";
 import ToolBar from "./ToolBar";
-import { useSocket } from "@/lib/context/SocketContext";
+import { socket } from "@/app/socket";
+import { useGameStore } from "@/app/providers/game-store-provider";
+import { DrawEventPayload } from "@/lib/types/types";
+import { canvasStrokes } from "@/lib/utils";
+import { useShallow } from "zustand/shallow";
 
 export default function Canvas() {
     const engineRef = useRef<DrawingEngine>(null);
     const divRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const {socket, isConnected} = useSocket();
+    const { currPlayer, strokeHistory, overlay } = useGameStore(useShallow((state) => ({ 
+        currPlayer: state.currPlayer,
+        strokeHistory: state.strokeHistory,
+        overlay: state.overlay
+    })));
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -31,34 +39,34 @@ export default function Canvas() {
 
         canvas.style.width = `${width}px`;
         canvas.style.height = `${height}px`;
-        canvas.style.backgroundColor = "snow";
-        canvas.style.border = `1px solid #000`;
+        canvas.style.backgroundColor = "var(--canvas)";
+        canvas.style.border = "1px solid var(--border)";
+        canvas.style.borderRadius = "var(--radius-lg)";
 
         engineRef.current = new DrawingEngine(canvas, socket);
 
-        socket.on("draw-event", (payload) => {
-        switch (payload.type){
-            case "mousedown":
-                engineRef.current?.startDrawing(payload.x, payload.y);
-                break;
-            case "mousemove":
-                engineRef.current?.draw(payload.x, payload.y);
-                break;
-            case "mouseup":
-                engineRef.current?.stopDrawing();
-                break;
-            case "mouseout":
-                engineRef.current?.stopDrawing();
-                break;
-        }
-    })
+        if (strokeHistory)
+            strokeHistory.forEach((p) => canvasStrokes(p, engineRef));
+
+        socket.on("draw-event", (payload: DrawEventPayload) => canvasStrokes(payload, engineRef))
 
         return () => {
+            console.log("destroying canvas");
             engineRef.current?.destroy();
             engineRef.current = null;
             socket.off("draw-event");
         }
-    }, []);
+    }, [strokeHistory]);
+
+    useEffect(() => {
+        if (overlay.type === "is-choosing" || overlay.type === "waiting") {
+            engineRef.current?.invertInputEnabled(currPlayer.isDrawer);
+            engineRef.current?.clear();
+            engineRef.current?.setBrush("#000000", 3);
+        } else {
+            engineRef.current?.invertInputEnabled(currPlayer.isDrawer);
+        }
+    }, [overlay.type, currPlayer.isDrawer]);
 
     return (
         <div className="h-full w-full">
@@ -67,9 +75,13 @@ export default function Canvas() {
                 ref={divRef}
             >
                 <canvas id="drawingCanvas" ref={canvasRef} className="w-full" />
-                <div className="flex h-auto w-full items-center justify-center">
-                    <ToolBar engineRef={engineRef} />
-                </div>
+                {
+                    currPlayer.isDrawer ?
+                        <div className="flex h-auto w-full items-center justify-center">
+                            <ToolBar engineRef={engineRef} />
+                        </div> :
+                        null
+                }
             </div>
         </div>
     );
