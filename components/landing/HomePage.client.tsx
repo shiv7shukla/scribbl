@@ -3,7 +3,7 @@
 import { useGameStore } from "@/app/providers/game-store-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
 

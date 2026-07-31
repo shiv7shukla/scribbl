@@ -4,19 +4,20 @@ import { useGameStore } from '@/app/providers/game-store-provider';
 import { useState, useEffect, memo } from 'react';
 import { useShallow } from 'zustand/shallow';
 
-const CountdownTimer = memo(() => {
+const CountdownTimer = memo(function CountdownTimer() {
     const { setTime, scoreBoard } = useGameStore((state) => state.actions);
     const { turnEndsAt, clockOffSet } = useGameStore(useShallow((state) => ({ turnEndsAt: state.turnEndsAt, clockOffSet: state.clockOffSet})));
     const [remaining, setRemaining] = useState(() => Math.max(0, turnEndsAt - Date.now()));
 
   useEffect(() => {
     const initial = Math.max(0, turnEndsAt - (Date.now() + clockOffSet));
-  console.log("mount/resync — turnEndsAt:", turnEndsAt, "now:", Date.now(), "initial remaining:", initial);
     setRemaining(initial);
 
     const interval = setInterval(() => {
       const rem = Math.max(0, turnEndsAt - (Date.now() + clockOffSet));
       setRemaining(rem);
+      setTime("minutes", minutes);
+      setTime("seconds", seconds);
       if (rem <= 0) {
         clearInterval(interval);
         scoreBoard();

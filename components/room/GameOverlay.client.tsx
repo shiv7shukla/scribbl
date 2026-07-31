@@ -123,8 +123,9 @@ const GameOverlay = memo(function GameOverlay() {
           </>
         )}
 
-        {overlay.type === "game-over" && <Confetti /> && (
+        {overlay.type === "game-over" && (
           <>
+            <Confetti />
             <p className="mt-2 font-display text-2xl">
               <span className="text-primary">{players[0].username} {" "} is the Winner !!!</span>
             </p>

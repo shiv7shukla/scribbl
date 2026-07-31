@@ -24,7 +24,7 @@ export class GameEngine{
     };
 
     public calculateDrawerPoints () {
-        const totalGuessers = Object.keys(this.allPlayers).length;
+        const totalGuessers = Object.keys(this.allPlayers).length - 1;
         const correctGuessCount = Object.values(this.allPlayers).reduce((count, p) => {
             return p.hasCorrectlyGuessed === true ? count + 1: count
         }, 0);
@@ -126,6 +126,7 @@ export class GameEngine{
     };
 
     public resetPLayers () {
+        this.strokeHistory = [];
         if (this.currentDrawer !== "")
             this.allPlayers[this.currentDrawer].isDrawer = false;
 

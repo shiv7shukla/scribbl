@@ -51,9 +51,11 @@ app.prepare().then(() => {
     });
 
     socket.on("join-created-room", (roomCode, payload) => {
+      const obj = rooms[roomCode];
+      
+      if (Object.keys(obj.allPlayers).length >= obj.maxPlayers) return;
       initializePayload(payload, socket, roomCode);
 
-      const obj = rooms[roomCode];
       obj.addPlayer(payload);
 
       io.to(roomCode).emit("new-joinee", Object.values(obj.allPlayers), payload);
@@ -75,9 +77,10 @@ app.prepare().then(() => {
     });
 
     socket.on("settings", (payload) => {
-      console.log("settings received:", payload.settingsName, payload.settingsVal);
-      rooms[socket.data.roomCode].setSettings(payload);
-      socket.to(payload.roomCode).emit("lobby-settings", payload);
+      if (rooms[socket.data.roomCode].allPlayers[socket.id].isAdmin === true) {
+        rooms[socket.data.roomCode].setSettings(payload);
+        socket.to(payload.roomCode).emit("lobby-settings", payload);
+      }
     });
 
     socket.on("new-message", (payload) => {
@@ -90,7 +93,7 @@ app.prepare().then(() => {
           obj.allPlayers[socket.id].hasCorrectlyGuessed === false
         ) {
           obj.setPoints("guesser", payload.minutes, payload.seconds, socket.id);
-          io.to(socket.data.roomCode).emit("correct-guess", payload, socket.id, Object.values(obj.allPlayers));
+          io.to(socket.data.roomCode).emit("correct-guess", {id: payload.id, sender: payload.sender, message: "Guessed Correctly!"}, socket.id, Object.values(obj.allPlayers));
         }
         else
           socket.to(socket.data.roomCode).emit("message-received", payload);
