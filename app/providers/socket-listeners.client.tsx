@@ -38,27 +38,25 @@ export function SocketListeners() {
       store.getState().actions.newMessage(payload);
     }
 
-    const onIsChoosing = (players: Player [], currTime: number, serverNow: number) => {
+    const onIsChoosing = (players: Player []) => {
       store.getState().actions.changeGamePhase();
-      store.getState().actions.setClockOffset(serverNow - Date.now());
-      store.getState().actions.setTurnEndsAt(currTime);
       const player = players.find((p) => p.isDrawer === true);
       if (player)
         store.getState().actions.setChoosingOverlay(player.username);
       store.getState().actions.newPlayers(players);
     };
 
-    const onWaiting = (words: string[], players: Player [], currTime: number, serverNow: number) => {
+    const onWaiting = (words: string[], players: Player []) => {
       store.getState().actions.changeGamePhase();
-      store.getState().actions.setClockOffset(serverNow - Date.now());
-      store.getState().actions.setTurnEndsAt(currTime);
       store.getState().actions.setWaitingOverlay(words);
       store.getState().actions.setCurrPlayer({ isDrawer: true });
       store.getState().actions.newPlayers(players);
     };
 
-    const onOverlayDismiss = (blanks: number) => {
+    const onOverlayDismiss = (blanks: number, currTime: number, serverNow: number) => {
       store.getState().actions.clearOverlay();
+      store.getState().actions.setClockOffset(serverNow - Date.now());
+      store.getState().actions.setTurnEndsAt(currTime);
       if (!store.getState().currPlayer.isDrawer)
         for (let i = 1; i <= blanks; i += 1)
           store.getState().guessWord += "_ ";
@@ -72,14 +70,13 @@ export function SocketListeners() {
     };
 
     const onScores = (players: Player[]) => {
-      console.log("onScores fired");
       store.getState().actions.newPlayers(players);
       store.setState((state) => ({ 
         overlay: { type: "score-board" },
         guessWord: "",
         currPlayer: { ...state.currPlayer, isDrawer: false, hasCorrectlyGuessed: false}
        }));
- console.log(store.getState().overlay);    };
+    };
 
     const allSettings = (payload: [{settingsName: string, settingsVal: string | number}]) => {
       payload.map((p) => {

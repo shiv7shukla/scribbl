@@ -13,15 +13,13 @@ export default function Canvas() {
     const engineRef = useRef<DrawingEngine>(null);
     const divRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const { currPlayer, strokeHistory, guessWord, overlay } = useGameStore(useShallow((state) => ({ 
+    const { currPlayer, strokeHistory, overlay } = useGameStore(useShallow((state) => ({ 
         currPlayer: state.currPlayer,
         strokeHistory: state.strokeHistory,
-        guessWord: state.guessWord,
         overlay: state.overlay
     })));
 
     useEffect(() => {
-        console.log("first useffect");
         const canvas = canvasRef.current;
         if (!(canvas instanceof HTMLCanvasElement)) return;
 
@@ -48,11 +46,7 @@ export default function Canvas() {
         engineRef.current = new DrawingEngine(canvas, socket);
 
         if (strokeHistory)
-        {
-
             strokeHistory.forEach((p) => canvasStrokes(p, engineRef));
-            console.log("replaying strokes");
-        }
 
         socket.on("draw-event", (payload: DrawEventPayload) => canvasStrokes(payload, engineRef))
 

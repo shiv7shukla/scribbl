@@ -11,8 +11,8 @@ const port = 3000;
 const app = next({ dev, hostname, port });
 const handler = app.getRequestHandler();
 
-
 export const rooms: Record<string, GameEngine> = {}; // roomCode => class object
+
 app.prepare().then(() => {
   const httpServer = createServer(handler);
   const io = new Server(httpServer, { transports: ["websocket"] });
@@ -35,12 +35,9 @@ app.prepare().then(() => {
 
     const drawer = obj.newDrawer();
     const words = obj.guessWords();
-
-    obj.turnEndsAt = (obj.drawTime * 1000) + Date.now();
-     console.log("gameStarter — drawTime:", obj.drawTime, "turnEndsAt:", obj.turnEndsAt);
     
-    socket.to(drawer).emit("choose-word", words, Object.values(obj.allPlayers), obj.turnEndsAt, Date.now()); // to the drawer
-    io.to(socket.data.roomCode).except(drawer).emit("is-choosing", Object.values(obj.allPlayers), obj.turnEndsAt, Date.now()); // to the guessers
+    socket.to(drawer).emit("choose-word", words, Object.values(obj.allPlayers)); // to the drawer
+    io.to(socket.data.roomCode).except(drawer).emit("is-choosing", Object.values(obj.allPlayers)); // to the guessers
   };
 
   io.on("connection", (socket) => {
@@ -113,7 +110,9 @@ app.prepare().then(() => {
       if (word)
         obj.guessWord = word;
 
-      io.to(socket.data.roomCode).emit("overlay-dismiss", obj.guessWord.length);
+      obj.turnEndsAt = (obj.drawTime * 1000) + Date.now();
+
+      io.to(socket.data.roomCode).emit("overlay-dismiss", obj.guessWord.length, obj.turnEndsAt, Date.now());
     });
 
     socket.on("new-turn", () => {
