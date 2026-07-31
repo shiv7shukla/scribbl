@@ -157,7 +157,7 @@ app.prepare().then(() => {
 
     socket.on("start-game", () => {
       const obj = rooms[socket.data.roomCode];
-      if (!obj) return;
+      if (!obj || socket.id !== obj.adminId) return;
 
       gameStarter(obj, socket.data.roomCode);
     });
@@ -168,9 +168,8 @@ app.prepare().then(() => {
 
       obj.newPhase("draw-and-guess");
 
-      if (word) {
+      if (word && obj.wordChoices.includes(word))
         obj.guessWord = word;
-      }
 
       obj.turnEndsAt = (obj.drawTime * 1000) + Date.now();
       scheduleTurnEnd(socket.data.roomCode, obj.drawTime * 1000);
