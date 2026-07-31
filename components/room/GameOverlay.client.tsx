@@ -1,13 +1,14 @@
 "use client";
 
 import { useGameStore } from "@/app/providers/game-store-provider";
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { Clock, Pencil } from "lucide-react";
 import { useShallow } from "zustand/shallow";
+import Confetti from "../Confetti";
 
 const CHOICE_SECONDS = 15;
 
-export default function GameOverlay() {
+const GameOverlay = memo(function GameOverlay() {
   const { submitWordChoice, clearOverlay } = useGameStore((state) => state.actions);
   const [secondsLeft, setSecondsLeft] = useState(CHOICE_SECONDS);
   const hasSubmitted = useRef(false);
@@ -121,7 +122,29 @@ export default function GameOverlay() {
             </div>
           </>
         )}
+
+        {overlay.type === "game-over" && <Confetti /> && (
+          <>
+            <p className="mt-2 font-display text-2xl">
+              <span className="text-primary">{players[0].username} {" "} is the Winner !!!</span>
+            </p>
+            <div className="mt-8 flex flex-col gap-3">
+              {players.map((p) => (
+                <div
+                  key={p.socketID}
+                  className="surface-btn w-full py-3.5 font-medium transition-colors"
+                >
+                  {p.username}
+                  {" "}
+                  {p.score}
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
-}
+});
+
+export default GameOverlay;

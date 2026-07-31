@@ -13,14 +13,10 @@ type ToolbarProps = {
 
 const ToolBar = ({ engineRef }: ToolbarProps) => {
     const currPlayer = useGameStore((state) => state.currPlayer);
+    const { sendBrushEvent } = useGameStore((state) => state.actions);
 
     const [color, setColor] = useState("#000000");
     const [size, setSize] = useState(3);
-
-    const sendBrushEvent = (payload: DrawEventPayload) => {
-        if (currPlayer.isDrawer) 
-            socket.emit("draw-event", payload);
-    }
 
     const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const nextColor = e.target.value;

@@ -55,6 +55,8 @@ export type sharedGameState = {
 	drawTime: number;
 	minutes: number;
 	seconds: number;
+	turnEndsAt: number;
+	clockOffSet: number;
 	strokeHistory: DrawEventPayload [];      
 };
 
@@ -62,7 +64,8 @@ export type gameOverlayState =
 	| { type: null }
 	| { type: "is-choosing"; username: string }
 	| { type: "waiting"; words: string[] }
-	| { type: "score-board"};
+	| { type: "score-board"}
+	| { type: "game-over"}
 
 export type privatePayload = {
   	guessWord: string;
@@ -77,6 +80,7 @@ export type gameActions = {
 	incrementRound: () => void;
 	changeGamePhase: () => void;
 	setDrawTime: (time: number) => void;
+	setTurnEndsAt: (currTime: number) => void;
 	setRoomCode: (roomCode: string) => void;
 	setUserName: (username: string) => void;
 	submitWordChoice: (word: string) => void;
@@ -85,14 +89,15 @@ export type gameActions = {
 	setWaitingOverlay: (words: string[]) => void;
 	markCorrectGuess: (socketID: string) => void;
 	setTime: (time: string, val: number) => void;
+	setClockOffset: (clockOffSet: number) => void;
 	setTotalRounds: (totalRounds: number) => void;
 	setChoosingOverlay: (username: string) => void;
 	enterRoom: (payload: Player, admin: boolean) => void;
+	sendBrushEvent: (payload: BrushEventPayload) => void;
 	setCurrPlayer: (updatedFields: Partial<Player>) => void;
 	setHistory: (payload: DrawEventPayload []) => void;
 	newMessage: (newMsg: {id: string, sender: string, message: string}) => void;
 	applyRemoteSettings: (settingsName: string, settingsVal: string | number | boolean) => void;
-	// sendLobbySettings: (settingsName: Partial<LobbySettings>, settingsVal: string | number | boolean) => void;
 	sendNewMessage: (payload: {id: string, sender: string, message: string, minutes: number, seconds: number}) => void;
 };
 

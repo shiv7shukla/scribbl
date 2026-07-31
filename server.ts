@@ -32,12 +32,15 @@ app.prepare().then(() => {
   };
   const gameStarter = (obj: GameEngine, socket: Socket) => {
     obj.newPhase("waiting");
-    
+
     const drawer = obj.newDrawer();
     const words = obj.guessWords();
-          
-    socket.to(drawer).emit("choose-word", words, Object.values(obj.allPlayers)); // to the drawer
-    io.to(socket.data.roomCode).except(drawer).emit("is-choosing", Object.values(obj.allPlayers)); // to the guessers
+
+    obj.turnEndsAt = (obj.drawTime * 1000) + Date.now();
+     console.log("gameStarter — drawTime:", obj.drawTime, "turnEndsAt:", obj.turnEndsAt);
+    
+    socket.to(drawer).emit("choose-word", words, Object.values(obj.allPlayers), obj.turnEndsAt, Date.now()); // to the drawer
+    io.to(socket.data.roomCode).except(drawer).emit("is-choosing", Object.values(obj.allPlayers), obj.turnEndsAt, Date.now()); // to the guessers
   };
 
   io.on("connection", (socket) => {
@@ -64,13 +67,18 @@ app.prepare().then(() => {
           settingsName: "drawTime", settingsVal: obj.drawTime
         }]);
 
+      // if (obj.gamePhase === "draw-and-guess" || obj.gamePhase === "waiting")
+      //   socket.emit("sync-turn", obj.turnEndsAt, Date.now());
+
       if (obj.gamePhase === "draw-and-guess") {
+        console.log(obj.strokeHistory.length);
         socket.emit("overlay-dismiss", obj.guessWord.length);
-        socket.emit("replay-history", obj.strokeHistory);
+        socket.emit("replay-history", obj.strokeHistory, obj.turnEndsAt, Date.now());
       }
     });
 
     socket.on("settings", (payload) => {
+      console.log("settings received:", payload.settingsName, payload.settingsVal);
       rooms[socket.data.roomCode].setSettings(payload);
       socket.to(payload.roomCode).emit("lobby-settings", payload);
     });
@@ -94,6 +102,7 @@ app.prepare().then(() => {
 
     socket.on("start-game", () => {
       const obj = rooms[socket.data.roomCode];
+
       gameStarter(obj, socket);
     });
 
@@ -112,22 +121,31 @@ app.prepare().then(() => {
 
     socket.on("score-board", () => {
       const obj = rooms[socket.data.roomCode];
+
       obj.setPoints("drawer");
       obj.resetPLayers();
-      io.to(socket.data.roomCode).emit("scores", Object.values(obj.allPlayers));
-      // socket.emit("scores", Object.values(obj.allPlayers));
 
+      io.to(socket.data.roomCode).emit("scores", Object.values(obj.allPlayers));
+
+      if (obj.turnOrder.length === 0 && obj.currentRound === obj.totalRounds) {
+        obj.gamePhase = "rounds-over";
+        io.to(socket.data.roomCode).emit("game-over", Object.values(obj.allPlayers));
+        return;
+      }
+
+      if (obj.turnOrder.length === 0)
+        io.to(socket.data.roomCode).emit("new-round");
       setTimeout(() => {
         gameStarter(obj, socket);
-      }, 5000);    
+      }, 5000);         
     });
 
     socket.on("draw-event", (payload: DrawEventPayload) => {
-      const obj = rooms[socket.data.roomCode];
-      if (obj.allPlayers[socket.id].isDrawer) {
-        socket.to(socket.data.roomCode).emit("draw-event", payload);
-        obj.addToHistory(payload);
-      }
+          const obj = rooms[socket.data.roomCode];
+          if (obj.allPlayers[socket.id].isDrawer) {
+            socket.to(socket.data.roomCode).emit("draw-event", payload);
+            obj.addToHistory(payload);
+          }
     });
 
   });

@@ -1,4 +1,4 @@
-import { gameStore, privatePayload, sharedGameState, type DrawEventPayload } from "@/lib/types/types";
+import { gameStore, privatePayload, sharedGameState, type BrushEventPayload, type DrawEventPayload } from "@/lib/types/types";
 import { createStore } from "zustand";
 import { socket } from "../socket";
 
@@ -15,6 +15,8 @@ export const defaultInitState: sharedGameState & privatePayload = {
     overlay: { type: null },
     minutes: 0,
     seconds: 0,
+    turnEndsAt: 0,
+    clockOffSet: 0,
     strokeHistory: [],
     currPlayer: {
         id: "",
@@ -36,6 +38,8 @@ export const createGameStore = ( initState: sharedGameState & privatePayload = d
             clearOverlay: () => set({ overlay: { type: null } }),
             incrementRound: () => set((state) => ({ currentRound: state.currentRound + 1 })),
             
+            setClockOffset: (clockOffSet: number) => set((state) => ({ clockOffSet })),
+            setTurnEndsAt: (currTime: number) => set((state) => ({ turnEndsAt: currTime })),
             setRoomCode: (roomCode) => set((state) => ({ roomCode: roomCode })),
             newPlayers: (newPlayers) => set((state) => ({ players: newPlayers })),
             applyRemoteSettings: (settingsName, settingsVal) => set((state) => ({ [settingsName]: settingsVal })),
@@ -87,9 +91,15 @@ export const createGameStore = ( initState: sharedGameState & privatePayload = d
             },
 
             scoreBoard: () => {
-                if (get().currPlayer.isDrawer)
+                if (get().currPlayer.isDrawer) {
                     socket.emit("score-board");
+                }
             },
+
+            sendBrushEvent: (payload: BrushEventPayload) => {
+                if (get().currPlayer.isDrawer) 
+                    socket.emit("draw-event", payload);
+            }
         }
     }))
 }

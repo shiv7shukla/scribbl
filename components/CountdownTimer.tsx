@@ -1,41 +1,35 @@
-"use cient";
+"use client";
 
 import { useGameStore } from '@/app/providers/game-store-provider';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
+import { useShallow } from 'zustand/shallow';
 
-const CountdownTimer = () => {
-    const { setTime, newTurn, scoreBoard } = useGameStore((state) => state.actions);
-    const drawTime = useGameStore((state) => state.drawTime);
-    const [ minutes, setMinutes ] = useState(Math.floor(drawTime / 60));
-    const [seconds, setSeconds ] =  useState(drawTime % 60);
+const CountdownTimer = memo(() => {
+    const { setTime, scoreBoard } = useGameStore((state) => state.actions);
+    const { turnEndsAt, clockOffSet } = useGameStore(useShallow((state) => ({ turnEndsAt: state.turnEndsAt, clockOffSet: state.clockOffSet})));
+    const [remaining, setRemaining] = useState(() => Math.max(0, turnEndsAt - Date.now()));
 
-    useEffect(() => {
-        let myInterval = setInterval(() => {
-            setSeconds(prev => {
-                if (prev > 0) return prev - 1;
-                else {
-                    setMinutes(minute => {
-                        if (minute > 0) return minute - 1;
-                        else {
-                            clearInterval(myInterval);
-                            return 0;
-                        }
-                    })
-                    return 59;
-                }
-            })
-        }, 1000)
-        return ()=> {
-            clearInterval(myInterval);
-          };
-    });
+  useEffect(() => {
+    const initial = Math.max(0, turnEndsAt - (Date.now() + clockOffSet));
+  console.log("mount/resync — turnEndsAt:", turnEndsAt, "now:", Date.now(), "initial remaining:", initial);
+    setRemaining(initial);
 
-    useEffect(() => {
-        setTime("seconds", seconds);
-        setTime("minutes", minutes);
-        if (seconds === 0 && minutes === 0) 
-            scoreBoard();
-    }, [seconds, minutes]);
+    const interval = setInterval(() => {
+      const rem = Math.max(0, turnEndsAt - (Date.now() + clockOffSet));
+      setRemaining(rem);
+      if (rem <= 0) {
+        clearInterval(interval);
+        scoreBoard();
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [turnEndsAt]);
+
+  const totalSeconds = Math.ceil(remaining / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+
 
     return (
         <div>
@@ -45,6 +39,6 @@ const CountdownTimer = () => {
         }
         </div>
     )
-}
+})
 
 export default CountdownTimer;

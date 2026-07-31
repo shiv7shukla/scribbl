@@ -14,6 +14,7 @@ export class GameEngine{
     public totalRounds: number;
     public drawTime: number;                
     public maxPlayers: number;
+    public turnEndsAt: number;
 
     public calcGueserPoints (timeRemaining: number, drawTime: number) {
         const basePoints = 50;
@@ -61,6 +62,29 @@ export class GameEngine{
     };
 
     public newDrawer (): string {
+        // if (this.turnOrder.length === 0 && this.currentRound !== this.totalRounds) {
+        //     this.formQueue();
+        //     this.currentRound += 1;
+        //     // if (this.currentRound === this.totalRounds) {
+
+        //     // }
+        // }
+
+        // else if (this.currentRound === this.totalRounds) {
+        //     // this.gamePhase = "rounds-over";
+        //     return "";
+        // }
+
+        if (this.turnOrder.length === 0) {
+            this.formQueue();
+            if (this.currentRound !== this.totalRounds) {
+                this.currentRound += 1;
+            }
+            else if (this.currentRound === this.totalRounds) {
+                return "";
+            }
+        }
+        
         const drawer = this.turnOrder.pop();
         if (drawer) {
             this.currentDrawer = drawer;
@@ -127,6 +151,7 @@ export class GameEngine{
         this.totalRounds = 3;
         this.maxPlayers = 8;
         this.currentRound = 1;
+        this.turnEndsAt = 0;
         this.turnOrder = [];
         this.strokeHistory = [];
         this.allPlayers = {};

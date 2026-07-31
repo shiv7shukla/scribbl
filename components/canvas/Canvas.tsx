@@ -13,13 +13,15 @@ export default function Canvas() {
     const engineRef = useRef<DrawingEngine>(null);
     const divRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const { currPlayer, strokeHistory, guessWord } = useGameStore(useShallow((state) => ({ 
+    const { currPlayer, strokeHistory, guessWord, overlay } = useGameStore(useShallow((state) => ({ 
         currPlayer: state.currPlayer,
         strokeHistory: state.strokeHistory,
-        guessWord: state.guessWord
+        guessWord: state.guessWord,
+        overlay: state.overlay
     })));
 
     useEffect(() => {
+        console.log("first useffect");
         const canvas = canvasRef.current;
         if (!(canvas instanceof HTMLCanvasElement)) return;
 
@@ -46,26 +48,29 @@ export default function Canvas() {
         engineRef.current = new DrawingEngine(canvas, socket);
 
         if (strokeHistory)
+        {
+
             strokeHistory.forEach((p) => canvasStrokes(p, engineRef));
+            console.log("replaying strokes");
+        }
 
         socket.on("draw-event", (payload: DrawEventPayload) => canvasStrokes(payload, engineRef))
 
         return () => {
+            console.log("destroying canvas");
             engineRef.current?.destroy();
             engineRef.current = null;
             socket.off("draw-event");
         }
-    }, []);
+    }, [strokeHistory]);
 
     useEffect(() => {
-        engineRef.current?.invertInputEnabled(currPlayer.isDrawer);
-        engineRef.current?.clear();
-        engineRef.current?.setBrush("#000000", 3);
-    }, [currPlayer.isDrawer, guessWord]);
-
-    // useEffect(() => {
-    //     engineRef.current?.clear();
-    // }, [guessWord]);
+        if (overlay.type === "is-choosing" || overlay.type === "waiting") {
+            engineRef.current?.invertInputEnabled(currPlayer.isDrawer);
+            engineRef.current?.clear();
+            engineRef.current?.setBrush("#000000", 3);
+        }
+    }, [overlay.type]);
 
     return (
         <div className="h-full w-full">

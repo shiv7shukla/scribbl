@@ -16,6 +16,8 @@ const RoomContent = ({ roomId }: { roomId: string }) => {
   const players = useGameStore((state) => state.players);
   const guessWord = useGameStore((state) => state.guessWord);
   const overlay = useGameStore((state) => state.overlay);
+  const currentRound = useGameStore((state) => state.currentRound);
+  const totalRounds = useGameStore((state) => state.totalRounds);
   const { setRoomCode } = useGameStore((state) => state.actions);
 
   useEffect(() => {
@@ -29,11 +31,13 @@ const RoomContent = ({ roomId }: { roomId: string }) => {
   return (
     <div className="relative min-h-screen bg-background">
       <Toaster position="top-center" />
-
       <header className="border-b border-border/60 bg-card/80 backdrop-blur-sm">
         <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-4 px-4 py-3">
           <div className="text-center">
             <h1 className="font-display text-2xl text-white tracking-tight">scribbl</h1>
+            <div className="text-center">
+              <h5 className="font-display text-xl text-white tracking-tight">Rounds: {currentRound}/{totalRounds}</h5>
+            </div>
           </div>
           <div className="text-center">
             <h1 className="font-display text-2xl text-white tracking-tight">{guessWord}</h1>

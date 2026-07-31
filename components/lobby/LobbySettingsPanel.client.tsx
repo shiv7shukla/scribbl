@@ -37,7 +37,6 @@ const LobbySettingsPanel = ({
     totalRounds, 
     maxPlayers, 
     players,
-    currPlayer,
     drawTime,
     roomCode,
   } = useGameStore(useShallow((state) => ({
@@ -52,7 +51,6 @@ const LobbySettingsPanel = ({
     setDrawTime, 
     setTotalRounds, 
     setMaxPlayers,
-    enterRoom,
     startGame,
     changeGamePhase
   } = useGameStore((state) => ( state.actions ));
