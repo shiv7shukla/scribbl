@@ -36,7 +36,7 @@ app.prepare().then(() => {
     const drawer = obj.newDrawer();
     const words = obj.guessWords();
     
-    socket.to(drawer).emit("choose-word", words, Object.values(obj.allPlayers)); // to the drawer
+    io.to(drawer).emit("choose-word", words, Object.values(obj.allPlayers)); // to the drawer
     io.to(socket.data.roomCode).except(drawer).emit("is-choosing", Object.values(obj.allPlayers)); // to the guessers
   };
 
